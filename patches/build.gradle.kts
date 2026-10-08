@@ -1,12 +1,11 @@
-group = "app.template"
+group = "app.immersivekeyboard"
 
 patches {
-    // TODO: Update this section with your project details.
     about {
-        name = "UserXYZ Patches"
-        description = "Patches for apps I like"
-        source = "git@github.com:UserXYZ/morphe-patches.git"
-        author = "Awesome dev"
+        name = "Immersive Keyboard Patches"
+        description = "Lets Gboard draw under the camera cutout in landscape"
+        source = "git@github.com:JacksonJones2003/immersive-keyboard-patches.git"
+        author = "JacksonJones2003"
         contact = "na"
         website = "na"
         license = "GPLv3"

@@ -1,16 +1,19 @@
-# 👋🧩 Morphe Patches template
+# Immersive Keyboard Patches
 
-Template repository for Morphe Patches.
+Patches for use with Morphe that make Gboard fill the screen edge to edge.
 
 ## ❓ About
 
-Patches for apps I like.
+On phones with a camera cutout, Android keeps the keyboard window out of the cutout
+area in landscape, which leaves an empty strip beside the keyboard. The
+`Immersive Keyboard` patch lets Gboard's keyboard window extend under the cutout.
 
-<!-- TODO: Update this about section with a brief introduction/summary about this repo and what it offers. -->
+It is a single, independent patch, so it can be applied alongside other Gboard patch
+sources such as [jasonwu1994/Gboard-patches](https://github.com/jasonwu1994/Gboard-patches).
 
 ### How to use these patches
 
-Click here to add these patches to Morphe: https://morphe.software/add-source?github=xyz-user/xyz-patches
+Click here to add these patches to Morphe: https://morphe.software/add-source?github=JacksonJones2003/immersive-keyboard-patches
 
 ## 🩹 Patches list
 
@@ -88,4 +91,4 @@ See the [Morphe documentation](https://github.com/MorpheApp/morphe-documentation
 
 ## 📜 License
 
-UserXYZ Patches are licensed under the [GNU General Public License v3.0](LICENSE)
+Immersive Keyboard Patches are licensed under the [GNU General Public License v3.0](LICENSE)
