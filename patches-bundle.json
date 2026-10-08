@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-08T20:52:48",
-  "description": "## [1.0.1-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.0.0...v1.0.1-dev.1) (2026-10-08)\n\n### 🐛 Bug Fixes\n\n* Enable Gboard's built-in edge-to-edge mode so the keyboard fills the cutout area ([b276e93](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/b276e9311c8814e93ab71d84b592fee8d1a4b216))",
-  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.0.1-dev.1/patches-1.0.1-dev.1.mpp",
+  "created_at": "2026-10-08T20:55:58",
+  "description": "## [1.0.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.0.0...v1.0.1) (2026-10-08)\n\n### 🐛 Bug Fixes\n\n* Enable Gboard's built-in edge-to-edge mode so the keyboard fills the cutout area ([b276e93](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/b276e9311c8814e93ab71d84b592fee8d1a4b216))",
+  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.0.1/patches-1.0.1.mpp",
   "signature_download_url": "",
-  "version": "1.0.1-dev.1"
+  "version": "1.0.1"
 }
