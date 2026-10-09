@@ -1,10 +1,10 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.3.0",
+  "version": "1.3.1-dev.1",
   "patches": [
     {
       "name": "Emoji Key On Right",
-      "description": "Moves the dedicated emoji key from the left of the spacebar to its right.",
+      "description": "Moves the dedicated emoji key from the left of the spacebar to just left of the enter / search key.",
       "default": true,
       "category": null,
       "dependencies": [],
