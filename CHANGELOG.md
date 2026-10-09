@@ -1,3 +1,9 @@
+## [1.4.2-dev.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.4.2-dev.1...v1.4.2-dev.2) (2026-10-09)
+
+### 🐛 Bug Fixes
+
+* Stop the top edge treatment landing one row too low when the toolbar row is not detected ([41217c8](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/41217c83030904b1773b84996864357c33b64ce3))
+
 ## [1.4.2-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.4.1...v1.4.2-dev.1) (2026-10-09)
 
 ### 🐛 Bug Fixes
