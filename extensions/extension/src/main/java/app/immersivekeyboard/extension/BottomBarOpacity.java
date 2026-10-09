@@ -34,6 +34,8 @@ import java.util.WeakHashMap;
 public final class BottomBarOpacity {
     private static final String BASE_AREA_TAG = ".keyboard-base-area";
     private static final String BODY_AREA_TAG = ".keyboard-body-area";
+    private static final String HEADER_AREA_TAG = ".keyboard-header-area";
+    private static final int NO_TOP = Integer.MAX_VALUE;
     private static final int OPAQUE = 255;
     private static final long REFRESH_INTERVAL_MS = 150;
 
@@ -206,6 +208,7 @@ public final class BottomBarOpacity {
         private Drawable blur;
         private Drawable topBlur;
         private int topColor;
+        private int keyboardTop = NO_TOP;
         private final int[] origin = new int[2];
         private final Path cornerPath = new Path();
         private final Path circlePath = new Path();
@@ -231,7 +234,8 @@ public final class BottomBarOpacity {
             cachedFallback = fallback;
             settings = FrostedGlass.read(inputView.getContext());
             squareKeyboardBlurBottom(inputView);
-            topColor = sampleTop(inputView);
+            keyboardTop = findKeyboardTop(inputView);
+            topColor = keyboardTop == NO_TOP ? 0 : sampleTop(inputView);
             int sampled = sampleKeyboard(inputView);
             boolean frostedCustom = settings.customAlpha >= 0 && settings.customAlpha < OPAQUE;
             if (Color.alpha(sampled) >= OPAQUE && frostedCustom) {
@@ -454,7 +458,10 @@ public final class BottomBarOpacity {
             float radius = settings.cornerRadiusDp
                     * inputView.getResources().getDisplayMetrics().density;
             float width = inputView.getWidth();
-            float top = windowTop(inputView);
+            if (keyboardTop == NO_TOP) {
+                return;
+            }
+            float top = topInInputView(inputView);
             float bottom = top + radius;
 
             cornerPath.rewind();
@@ -471,13 +478,41 @@ public final class BottomBarOpacity {
             canvas.drawPath(cornerPath, cornerPaint);
         }
 
-        /**
-         * Top edge of the keyboard window, in InputView coordinates. Frosted Glass blurs the
-         * window as one rounded rectangle, so this is where its top corners are.
-         */
-        private float windowTop(View inputView) {
+        /** Top edge of the visible keyboard, in InputView coordinates. */
+        private float topInInputView(View inputView) {
             inputView.getLocationInWindow(origin);
-            return -origin[1];
+            return keyboardTop - origin[1];
+        }
+
+        /**
+         * Window Y of the top edge of the visible keyboard: the highest of its themed header
+         * and body panels. The keyboard window itself can be as tall as the screen, so its own
+         * top edge says nothing about where the keyboard starts.
+         */
+        private int findKeyboardTop(View inputView) {
+            int[] top = {NO_TOP};
+            collectKeyboardTop(inputView, inputView.getWidth() * 0.95f, top);
+            return top[0];
+        }
+
+        private void collectKeyboardTop(View view, float minWidth, int[] top) {
+            if (view.getVisibility() != View.VISIBLE) {
+                return;
+            }
+            Object tag = view.getTag();
+            if (tag instanceof String && view.getBackground() != null
+                    && view.getWidth() >= minWidth && view.getHeight() > 0
+                    && (((String) tag).contains(HEADER_AREA_TAG)
+                    || ((String) tag).contains(BODY_AREA_TAG))) {
+                view.getLocationInWindow(location);
+                top[0] = Math.min(top[0], location[1]);
+            }
+            if (view instanceof ViewGroup) {
+                ViewGroup group = (ViewGroup) view;
+                for (int index = 0; index < group.getChildCount(); index++) {
+                    collectKeyboardTop(group.getChildAt(index), minWidth, top);
+                }
+            }
         }
 
         /** Color of the keyboard just inside its top edge, where the top corners are. */
@@ -487,8 +522,7 @@ public final class BottomBarOpacity {
                         * panel.getResources().getDisplayMetrics().density;
                 panel.getLocationInWindow(location);
                 float sampleX = location[0] + panel.getWidth() / 2f;
-                // Window coordinates: the window's top edge is at zero.
-                float sampleY = radius / 2f;
+                float sampleY = keyboardTop + radius / 2f;
                 List<View> stack = new ArrayList<>();
                 stack.add(panel);
                 View current = panel;
@@ -558,7 +592,7 @@ public final class BottomBarOpacity {
                 blur.draw(canvas);
 
                 // A second blur region behind the keyboard's top corners.
-                {
+                if (keyboardTop != NO_TOP) {
                     if (topBlur == null) {
                         Method getRoot = View.class.getDeclaredMethod("getViewRootImpl");
                         getRoot.setAccessible(true);
@@ -570,8 +604,8 @@ public final class BottomBarOpacity {
                         topBlur.setVisible(true, false);
                     }
                     setRadius.invoke(topBlur, settings.blurRadiusPx);
-                    int windowTop = Math.round(windowTop(inputView));
-                    topBlur.setBounds(0, windowTop, width, windowTop + overlap);
+                    int keyboardTopY = Math.round(topInInputView(inputView));
+                    topBlur.setBounds(0, keyboardTopY, width, keyboardTopY + overlap);
                     topBlur.draw(canvas);
                 }
             } catch (Throwable ignored) {
