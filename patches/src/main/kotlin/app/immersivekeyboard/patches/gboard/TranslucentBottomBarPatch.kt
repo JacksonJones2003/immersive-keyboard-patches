@@ -20,6 +20,22 @@ val translucentBottomBarPatch = bytecodePatch(
     extendWith("extensions/extension.mpe")
 
     execute {
+        // Before Android 16 the strip is the window's navigation bar color. The same value is
+        // also handed to InputView, so scale it once here, before it is read.
+        ApplyNavigationBarColorFingerprint.let {
+            val readCurrentColor = it.instructionMatches[0].index
+            val colorRegister = it.method.getInstruction<FiveRegisterInstruction>(
+                it.instructionMatches[1].index
+            ).registerD
+            it.method.addInstructions(
+                readCurrentColor,
+                """
+                    invoke-static { p1, v$colorRegister }, $EXTENSION_CLASS->navigationBarColor(Landroid/view/Window;I)I
+                    move-result v$colorRegister
+                """
+            )
+        }
+
         // On Android 16+ Gboard paints this strip itself, in an opaque theme color, in the
         // bottom padding of InputView. Scale that color by the keyboard surfaces' alpha.
         InputViewOnDrawFingerprint.let {

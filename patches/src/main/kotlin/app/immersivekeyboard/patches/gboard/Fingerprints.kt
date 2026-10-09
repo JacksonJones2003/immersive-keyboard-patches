@@ -60,3 +60,21 @@ object InputViewOnDrawFingerprint : Fingerprint(
         )
     )
 )
+
+/**
+ * Applies the navigation bar color Gboard computed from the keyboard theme to the IME window.
+ */
+object ApplyNavigationBarColorFingerprint : Fingerprint(
+    returnType = "V",
+    parameters = listOf("Landroid/view/Window;", "L"),
+    filters = listOf(
+        methodCall(
+            definingClass = "Landroid/view/Window;",
+            name = "getNavigationBarColor",
+        ),
+        methodCall(
+            definingClass = "Landroid/view/Window;",
+            name = "setNavigationBarColor",
+        )
+    )
+)
