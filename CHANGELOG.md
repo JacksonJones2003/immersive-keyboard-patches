@@ -1,3 +1,9 @@
+## [1.1.4](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.1.3...v1.1.4) (2026-10-09)
+
+### 🐛 Bug Fixes
+
+* Fill the unblurred bottom corners where the keyboard meets the bottom bar ([e75e76d](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/e75e76d7d30d9af62effee76c9f8d53b683a0ce2))
+
 ## [1.1.4-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.1.3...v1.1.4-dev.1) (2026-10-09)
 
 ### 🐛 Bug Fixes
