@@ -1,3 +1,9 @@
+## [1.4.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.3.2...v1.4.0) (2026-10-09)
+
+### ✨ New Features
+
+* Add Glass Panel patch for Gboard ([141edc6](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/141edc6c40fe3fd09bf1d83bdf082ea4b6503d3d))
+
 ## [1.4.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.3.2...v1.4.0-dev.1) (2026-10-09)
 
 ### ✨ New Features
