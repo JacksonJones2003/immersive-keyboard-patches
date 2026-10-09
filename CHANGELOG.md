@@ -1,3 +1,9 @@
+## [1.3.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.3.1...v1.3.2) (2026-10-09)
+
+### 🐛 Bug Fixes
+
+* Square the top corners at the visible keyboard's top edge, not the top of the keyboard window ([9c8e4c5](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/9c8e4c5a14b002c34e91e7f9bfb9a552a554ccfe))
+
 ## [1.3.2-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.3.1...v1.3.2-dev.1) (2026-10-09)
 
 ### 🐛 Bug Fixes
