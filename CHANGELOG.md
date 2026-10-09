@@ -1,3 +1,9 @@
+## [1.4.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.4.0...v1.4.1) (2026-10-09)
+
+### 🐛 Bug Fixes
+
+* Republish after a failed release step ([3c46565](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/3c46565116a8c2b7de7efcca3146ae058e41720b))
+
 ## [1.4.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.3.2...v1.4.0) (2026-10-09)
 
 ### ✨ New Features
