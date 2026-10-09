@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.4.1...v1.4.2) (2026-10-09)
+
+### 🐛 Bug Fixes
+
+* Match the bottom bar to the row of the keyboard directly above it ([e4adc8d](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/e4adc8d492a6fbfec96b1c197aee98d7c8329699))
+* Stop the top edge treatment landing one row too low when the toolbar row is not detected ([41217c8](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/41217c83030904b1773b84996864357c33b64ce3))
+
 ## [1.4.2-dev.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.4.2-dev.1...v1.4.2-dev.2) (2026-10-09)
 
 ### 🐛 Bug Fixes
