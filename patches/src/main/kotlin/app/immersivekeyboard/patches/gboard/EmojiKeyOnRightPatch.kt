@@ -9,7 +9,8 @@ private const val EXTENSION_CLASS = "Lapp/immersivekeyboard/extension/EmojiKeyPo
 @Suppress("unused")
 val emojiKeyOnRightPatch = bytecodePatch(
     name = "Emoji Key On Right",
-    description = "Moves the dedicated emoji key from the left of the spacebar to its right.",
+    description = "Moves the dedicated emoji key from the left of the spacebar to just left of " +
+        "the enter / search key.",
     default = true
 ) {
     compatibleWith(COMPATIBILITY_GBOARD)

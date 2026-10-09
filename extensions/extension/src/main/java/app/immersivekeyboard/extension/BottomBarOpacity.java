@@ -205,7 +205,6 @@ public final class BottomBarOpacity {
         private boolean attachListenerAdded;
         private Drawable blur;
         private Drawable topBlur;
-        private WeakReference<View> blurHost = new WeakReference<>(null);
         private int topColor;
         private final int[] origin = new int[2];
         private final Path cornerPath = new Path();
@@ -232,9 +231,7 @@ public final class BottomBarOpacity {
             cachedFallback = fallback;
             settings = FrostedGlass.read(inputView.getContext());
             squareKeyboardBlurBottom(inputView);
-            View panel = findBlurHost(inputView.getRootView());
-            blurHost = new WeakReference<>(panel);
-            topColor = panel == null ? 0 : sampleTop(panel);
+            topColor = sampleTop(inputView);
             int sampled = sampleKeyboard(inputView);
             boolean frostedCustom = settings.customAlpha >= 0 && settings.customAlpha < OPAQUE;
             if (Color.alpha(sampled) >= OPAQUE && frostedCustom) {
@@ -448,16 +445,16 @@ public final class BottomBarOpacity {
          * keyboard, giving it a straight top edge.
          */
         void repaintTopCorners(View inputView, Canvas canvas) {
-            View panel = blurHost.get();
-            if (!settings.enabled || topBlur == null || panel == null || !panel.isShown()
+            View keyboard = surface.get();
+            if (!settings.enabled || topBlur == null || keyboard == null
                     || Color.alpha(drawnColor) >= OPAQUE
-                    || panel.getWidth() < inputView.getWidth() * 0.95f) {
+                    || keyboard.getWidth() < inputView.getWidth() * 0.95f) {
                 return;
             }
             float radius = settings.cornerRadiusDp
                     * inputView.getResources().getDisplayMetrics().density;
             float width = inputView.getWidth();
-            float top = panelTop(inputView, panel);
+            float top = windowTop(inputView);
             float bottom = top + radius;
 
             cornerPath.rewind();
@@ -474,11 +471,13 @@ public final class BottomBarOpacity {
             canvas.drawPath(cornerPath, cornerPaint);
         }
 
-        /** Top edge of the blurred keyboard panel, in InputView coordinates. */
-        private float panelTop(View inputView, View panel) {
-            panel.getLocationInWindow(location);
+        /**
+         * Top edge of the keyboard window, in InputView coordinates. Frosted Glass blurs the
+         * window as one rounded rectangle, so this is where its top corners are.
+         */
+        private float windowTop(View inputView) {
             inputView.getLocationInWindow(origin);
-            return location[1] - origin[1];
+            return -origin[1];
         }
 
         /** Color of the keyboard just inside its top edge, where the top corners are. */
@@ -488,7 +487,8 @@ public final class BottomBarOpacity {
                         * panel.getResources().getDisplayMetrics().density;
                 panel.getLocationInWindow(location);
                 float sampleX = location[0] + panel.getWidth() / 2f;
-                float sampleY = location[1] + radius / 2f;
+                // Window coordinates: the window's top edge is at zero.
+                float sampleY = radius / 2f;
                 List<View> stack = new ArrayList<>();
                 stack.add(panel);
                 View current = panel;
@@ -518,35 +518,6 @@ public final class BottomBarOpacity {
             } catch (Throwable ignored) {
                 return 0;
             }
-        }
-
-        /** The view Frosted Glass put its blur on, which is the keyboard panel. */
-        private View findBlurHost(View view) {
-            if (view == null || view.getVisibility() != View.VISIBLE) {
-                return null;
-            }
-            Drawable background = view.getBackground();
-            if (background instanceof LayerDrawable) {
-                LayerDrawable layers = (LayerDrawable) background;
-                for (int index = 0; index < layers.getNumberOfLayers(); index++) {
-                    Drawable layer = layers.getDrawable(index);
-                    if (layer != null && isBlur(layer)) {
-                        return view;
-                    }
-                }
-            } else if (background != null && isBlur(background)) {
-                return view;
-            }
-            if (view instanceof ViewGroup) {
-                ViewGroup group = (ViewGroup) view;
-                for (int index = 0; index < group.getChildCount(); index++) {
-                    View match = findBlurHost(group.getChildAt(index));
-                    if (match != null) {
-                        return match;
-                    }
-                }
-            }
-            return null;
         }
 
         /**
@@ -587,8 +558,7 @@ public final class BottomBarOpacity {
                 blur.draw(canvas);
 
                 // A second blur region behind the keyboard's top corners.
-                View panel = blurHost.get();
-                if (panel != null && panel.isShown()) {
+                {
                     if (topBlur == null) {
                         Method getRoot = View.class.getDeclaredMethod("getViewRootImpl");
                         getRoot.setAccessible(true);
@@ -600,8 +570,8 @@ public final class BottomBarOpacity {
                         topBlur.setVisible(true, false);
                     }
                     setRadius.invoke(topBlur, settings.blurRadiusPx);
-                    int panelTop = Math.round(panelTop(inputView, panel));
-                    topBlur.setBounds(0, panelTop, width, panelTop + overlap);
+                    int windowTop = Math.round(windowTop(inputView));
+                    topBlur.setBounds(0, windowTop, width, windowTop + overlap);
                     topBlur.draw(canvas);
                 }
             } catch (Throwable ignored) {

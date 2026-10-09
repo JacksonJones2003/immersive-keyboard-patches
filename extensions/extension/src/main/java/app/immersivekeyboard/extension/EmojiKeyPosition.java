@@ -3,6 +3,7 @@ package app.immersivekeyboard.extension;
 import android.content.res.Resources;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 
@@ -14,13 +15,13 @@ import java.util.WeakHashMap;
 
 /**
  * Moves the dedicated emoji key (the slot Gboard shares with the language switch key) from
- * the left of the spacebar to its right.
+ * the left of the spacebar to just left of the enter / search key.
  */
 @SuppressWarnings("unused")
 public final class EmojiKeyPosition {
     // Layout slot names from Gboard's bottom row layouts.
     private static final String EMOJI_KEY_SLOT = "key_pos_switch_to_next_language";
-    private static final String SPACE_KEY_SLOT = "key_pos_space";
+    private static final String ACTION_KEY_SLOT = "key_pos_ime_action";
 
     private static final Map<View, Watcher> WATCHERS = new WeakHashMap<>();
 
@@ -48,7 +49,7 @@ public final class EmojiKeyPosition {
         private final WeakReference<View> inputView;
         private WeakReference<ViewTreeObserver> observer = new WeakReference<>(null);
         private int emojiSlotId;
-        private int spaceSlotId;
+        private int actionSlotId;
 
         Watcher(View inputView) {
             this.inputView = new WeakReference<>(inputView);
@@ -78,7 +79,7 @@ public final class EmojiKeyPosition {
                 List<View> emojiKeys = new ArrayList<>();
                 collect(view.getRootView(), emojiSlotId, emojiKeys);
                 for (View key : emojiKeys) {
-                    moveRightOfSpace(key);
+                    moveBeforeActionKey(key);
                 }
             } catch (Throwable ignored) {
                 // Leave the keyboard as Gboard laid it out.
@@ -86,7 +87,7 @@ public final class EmojiKeyPosition {
         }
 
         private boolean resolveSlots(View view) {
-            if (emojiSlotId != 0 && spaceSlotId != 0) {
+            if (emojiSlotId != 0 && actionSlotId != 0) {
                 return true;
             }
             Resources resources = view.getResources();
@@ -95,8 +96,8 @@ public final class EmojiKeyPosition {
                     ? resources.getResourcePackageName(view.getId())
                     : view.getContext().getPackageName();
             emojiSlotId = resources.getIdentifier(EMOJI_KEY_SLOT, "id", resourcePackage);
-            spaceSlotId = resources.getIdentifier(SPACE_KEY_SLOT, "id", resourcePackage);
-            return emojiSlotId != 0 && spaceSlotId != 0;
+            actionSlotId = resources.getIdentifier(ACTION_KEY_SLOT, "id", resourcePackage);
+            return emojiSlotId != 0 && actionSlotId != 0;
         }
 
         private static void collect(View view, int id, List<View> out) {
@@ -113,32 +114,42 @@ public final class EmojiKeyPosition {
         }
 
         /**
-         * The key sits in a horizontal row next to the spacebar, or next to a group holding
-         * the spacebar. If it comes before that sibling, move it to the end of the row.
+         * Takes the key out of its slot beside the spacebar and puts it directly before the
+         * enter / search key of the same keyboard. Rows size their keys by weight and the two
+         * rows use different scales, so the key keeps the width it was laid out with.
          */
-        private void moveRightOfSpace(View key) {
-            if (!(key.getParent() instanceof LinearLayout)) {
+        private void moveBeforeActionKey(View key) {
+            if (key.getVisibility() != View.VISIBLE || key.getWidth() <= 0
+                    || !(key.getParent() instanceof ViewGroup)) {
                 return;
             }
-            LinearLayout row = (LinearLayout) key.getParent();
+            View actionKey = null;
+            for (ViewParent parent = key.getParent(); parent instanceof View && actionKey == null;
+                    parent = parent.getParent()) {
+                actionKey = ((View) parent).findViewById(actionSlotId);
+            }
+            if (actionKey == null || !(actionKey.getParent() instanceof LinearLayout)) {
+                return;
+            }
+            LinearLayout row = (LinearLayout) actionKey.getParent();
             if (row.getOrientation() != LinearLayout.HORIZONTAL) {
                 return;
             }
-            int keyIndex = row.indexOfChild(key);
-            int spaceIndex = -1;
-            for (int index = 0; index < row.getChildCount(); index++) {
-                View sibling = row.getChildAt(index);
-                if (sibling != key && sibling.findViewById(spaceSlotId) != null) {
-                    spaceIndex = index;
-                    break;
-                }
-            }
-            if (spaceIndex < 0 || keyIndex > spaceIndex) {
+            if (key.getParent() == row
+                    && row.indexOfChild(key) == row.indexOfChild(actionKey) - 1) {
                 return;
             }
-            ViewGroup.LayoutParams params = key.getLayoutParams();
-            row.removeView(key);
-            row.addView(key, params);
+            ViewGroup.LayoutParams old = key.getLayoutParams();
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    key.getWidth(), old == null ? ViewGroup.LayoutParams.MATCH_PARENT : old.height,
+                    0f);
+            if (old instanceof ViewGroup.MarginLayoutParams) {
+                ViewGroup.MarginLayoutParams margins = (ViewGroup.MarginLayoutParams) old;
+                params.setMargins(margins.leftMargin, margins.topMargin,
+                        margins.rightMargin, margins.bottomMargin);
+            }
+            ((ViewGroup) key.getParent()).removeView(key);
+            row.addView(key, row.indexOfChild(actionKey), params);
         }
     }
 }
