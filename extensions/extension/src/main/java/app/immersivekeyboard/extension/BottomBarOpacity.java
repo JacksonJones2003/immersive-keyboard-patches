@@ -498,32 +498,38 @@ public final class BottomBarOpacity {
         }
 
         /**
-         * Window Y of the top edge of the visible keyboard: the highest of its themed header
-         * and body panels. The keyboard window itself can be as tall as the screen, so its own
-         * top edge says nothing about where the keyboard starts.
+         * Window Y of the top edge of the visible keyboard: the highest of its themed panels.
+         * The keyboard window itself can be as tall as the screen, so its own top edge says
+         * nothing about where the keyboard starts.
          */
         private int findKeyboardTop(View inputView) {
             int[] top = {NO_TOP};
-            collectKeyboardTop(inputView, inputView.getWidth() * 0.95f, top);
+            // A panel that fills most of the window is a container, not the keyboard.
+            float maxHeight = inputView.getRootView().getHeight() * 0.8f;
+            collectKeyboardTop(inputView, inputView.getWidth() * 0.8f, maxHeight, top);
             return top[0];
         }
 
-        private void collectKeyboardTop(View view, float minWidth, int[] top) {
+        private void collectKeyboardTop(View view, float minWidth, float maxHeight, int[] top) {
             if (view.getVisibility() != View.VISIBLE) {
                 return;
             }
             Object tag = view.getTag();
-            if (tag instanceof String && view.getBackground() != null
-                    && view.getWidth() >= minWidth && view.getHeight() > 0
+            // The toolbar row does not always carry a background of its own, and is not always
+            // tagged by the time the keyboard first draws, so the panel that contains it
+            // counts as well. Taking only the key area here puts the top edge one row too low.
+            if (tag instanceof String && view.getWidth() >= minWidth && view.getHeight() > 0
+                    && view.getHeight() <= maxHeight
                     && (((String) tag).contains(HEADER_AREA_TAG)
-                    || ((String) tag).contains(BODY_AREA_TAG))) {
+                    || ((String) tag).contains(BODY_AREA_TAG)
+                    || ((String) tag).contains(BASE_AREA_TAG))) {
                 view.getLocationInWindow(location);
                 top[0] = Math.min(top[0], location[1]);
             }
             if (view instanceof ViewGroup) {
                 ViewGroup group = (ViewGroup) view;
                 for (int index = 0; index < group.getChildCount(); index++) {
-                    collectKeyboardTop(group.getChildAt(index), minWidth, top);
+                    collectKeyboardTop(group.getChildAt(index), minWidth, maxHeight, top);
                 }
             }
         }
