@@ -182,7 +182,12 @@ public final class BottomBarOpacity {
             cachedFallback = fallback;
             settings = FrostedGlass.read(inputView.getContext());
             int sampled = sampleKeyboard(inputView);
-            if (Color.alpha(sampled) > 0) {
+            boolean frostedCustom = settings.customAlpha >= 0 && settings.customAlpha < OPAQUE;
+            if (Color.alpha(sampled) >= OPAQUE && frostedCustom) {
+                // Frosted Glass is set to be see-through but the keyboard was read as solid:
+                // trust the setting for opacity and keep the keyboard's color.
+                cachedColor = withAlpha(sampled, settings.customAlpha);
+            } else if (Color.alpha(sampled) > 0) {
                 cachedColor = sampled;
             } else if (settings.customAlpha >= 0 && Color.alpha(fallback) == OPAQUE) {
                 cachedColor = withAlpha(fallback, settings.customAlpha);
@@ -242,7 +247,10 @@ public final class BottomBarOpacity {
         }
 
         /**
-         * Background blur layers only work on a hardware canvas and add no color of their own.
+         * Draws a background the way it ends up on screen. A background blur layer clears
+         * everything painted beneath it in the same view (Frosted Glass stacks one on top of
+         * the keyboard's original base background), so only the layers above it count. The
+         * blur layer itself needs a hardware canvas and adds no color of its own.
          */
         private static void drawWithoutBlur(Drawable drawable, Canvas canvas) {
             if (isBlur(drawable)) {
@@ -250,9 +258,16 @@ public final class BottomBarOpacity {
             }
             if (drawable instanceof LayerDrawable) {
                 LayerDrawable layers = (LayerDrawable) drawable;
+                int first = 0;
                 for (int index = 0; index < layers.getNumberOfLayers(); index++) {
                     Drawable layer = layers.getDrawable(index);
-                    if (layer != null && !isBlur(layer)) {
+                    if (layer != null && isBlur(layer)) {
+                        first = index + 1;
+                    }
+                }
+                for (int index = first; index < layers.getNumberOfLayers(); index++) {
+                    Drawable layer = layers.getDrawable(index);
+                    if (layer != null) {
                         layer.draw(canvas);
                     }
                 }
