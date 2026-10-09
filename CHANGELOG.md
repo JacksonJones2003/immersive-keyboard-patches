@@ -1,3 +1,9 @@
+## [1.1.3](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.1.2...v1.1.3) (2026-10-09)
+
+### 🐛 Bug Fixes
+
+* Stop the bottom bar reading the keyboard as solid under Frosted Glass ([e5949ca](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/e5949cafdb5427cfa6345f6d7e674fc38715bb8c))
+
 ## [1.1.3-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.1.2...v1.1.3-dev.1) (2026-10-09)
 
 ### 🐛 Bug Fixes
