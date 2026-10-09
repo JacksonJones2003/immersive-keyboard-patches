@@ -1,3 +1,9 @@
+## [1.4.2-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.4.1...v1.4.2-dev.1) (2026-10-09)
+
+### 🐛 Bug Fixes
+
+* Match the bottom bar to the row of the keyboard directly above it ([e4adc8d](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/e4adc8d492a6fbfec96b1c197aee98d7c8329699))
+
 ## [1.4.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.4.0...v1.4.1) (2026-10-09)
 
 ### 🐛 Bug Fixes
