@@ -42,6 +42,7 @@ public final class BottomBarOpacity {
     private static final String FROSTED_GLASS_BLUR_STRENGTH = "pref_frosted_glass_blur_radius_px";
     private static final int FROSTED_GLASS_DEFAULT_OPACITY = 20;
     private static final int FROSTED_GLASS_DEFAULT_BLUR_STRENGTH = 20;
+    private static final float FROSTED_GLASS_CORNER_RADIUS_DP = 32.0f;
 
     private static final Map<View, State> STATES = new WeakHashMap<>();
 
@@ -308,7 +309,13 @@ public final class BottomBarOpacity {
                 setRadius.invoke(blur, settings.blurRadiusPx);
                 int width = inputView.getWidth();
                 int height = inputView.getHeight();
-                blur.setBounds(0, height - inputView.getPaddingBottom(), width, height);
+                // Frosted Glass rounds all four corners of its blur, which leaves the two
+                // bottom corners of the keyboard unblurred where they meet the strip. Reach up
+                // behind the keyboard by that corner radius to fill them in.
+                int overlap = Math.round(FROSTED_GLASS_CORNER_RADIUS_DP
+                        * inputView.getResources().getDisplayMetrics().density);
+                int top = Math.max(0, height - inputView.getPaddingBottom() - overlap);
+                blur.setBounds(0, top, width, height);
                 blur.draw(canvas);
             } catch (Throwable ignored) {
                 blur = null;
