@@ -1,3 +1,9 @@
+## [1.3.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.3.0...v1.3.1) (2026-10-09)
+
+### 🐛 Bug Fixes
+
+* Square the top corners at the keyboard window's edge and place the emoji key left of the action key ([2957cf2](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/2957cf2b2d83db5e536249944914a936f429b702))
+
 ## [1.3.1-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.3.0...v1.3.1-dev.1) (2026-10-09)
 
 ### 🐛 Bug Fixes
