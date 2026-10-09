@@ -5,17 +5,27 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Outline;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
 import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +53,8 @@ public final class BottomBarOpacity {
     private static final int FROSTED_GLASS_DEFAULT_OPACITY = 20;
     private static final int FROSTED_GLASS_DEFAULT_BLUR_STRENGTH = 20;
     private static final float FROSTED_GLASS_CORNER_RADIUS_DP = 32.0f;
+    /** Size of the area inspected at each bottom corner of the keyboard panel. */
+    private static final float CORNER_AREA_DP = 48.0f;
 
     private static final Map<View, State> STATES = new WeakHashMap<>();
 
@@ -59,10 +71,15 @@ public final class BottomBarOpacity {
             state.watch(inputView);
             int keyboardColor = state.keyboardColor(inputView, color);
             state.drawnColor = keyboardColor;
+            state.drawnCornerRadius = state.cornerRadiusPx;
             if (Color.alpha(keyboardColor) >= OPAQUE) {
                 return color;
             }
             state.drawBlur(inputView, canvas);
+            if (state.drawSeamless(inputView, canvas, keyboardColor)) {
+                // The strip was painted here; let Gboard's own rectangle paint nothing.
+                return Color.TRANSPARENT;
+            }
             return keyboardColor;
         } catch (Throwable ignored) {
             return color;
@@ -156,6 +173,26 @@ public final class BottomBarOpacity {
     private static final class State implements ViewTreeObserver.OnPreDrawListener,
             View.OnAttachStateChangeListener {
         int drawnColor;
+        int drawnCornerRadius;
+        /** Radius of the keyboard panel's rounded bottom corners, or 0 when they are square. */
+        int cornerRadiusPx;
+        private int cornerAreaPx;
+        private Bitmap leftCorner;
+        private Bitmap rightCorner;
+        private final Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint cutOutPaint = new Paint();
+        private final Path stripPath = new Path();
+        private final int[] origin = new int[2];
+
+        State() {
+            // Erases wherever the keyboard paints anything at all, however faintly.
+            cutOutPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
+            cutOutPaint.setColorFilter(new ColorMatrixColorFilter(new float[]{
+                    1, 0, 0, 0, 0,
+                    0, 1, 0, 0, 0,
+                    0, 0, 1, 0, 0,
+                    0, 0, 0, 255, 0}));
+        }
         private WeakReference<View> inputView = new WeakReference<>(null);
         private WeakReference<View> surface = new WeakReference<>(null);
         private final Bitmap pixel = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
@@ -195,6 +232,11 @@ public final class BottomBarOpacity {
             } else {
                 cachedColor = fallback;
             }
+            try {
+                measureCorners(inputView, cachedColor);
+            } catch (Throwable ignored) {
+                cornerRadiusPx = 0;
+            }
             return cachedColor;
         }
 
@@ -205,46 +247,180 @@ public final class BottomBarOpacity {
          */
         private int sampleKeyboard(View inputView) {
             try {
-                View target = surface.get();
-                if (target == null || !target.isAttachedToWindow() || !target.isShown()) {
-                    View root = inputView.getRootView();
-                    target = find(root, BODY_AREA_TAG);
-                    if (target == null) {
-                        target = find(root, BASE_AREA_TAG);
-                    }
-                    surface = new WeakReference<>(target);
-                }
-                if (target == null || target.getWidth() <= 0 || target.getHeight() <= 0) {
+                List<View> stack = keyboardStack(inputView);
+                if (stack.isEmpty()) {
                     return 0;
                 }
-                List<View> stack = new ArrayList<>();
-                for (View view = target; view != null && view != inputView; ) {
-                    stack.add(view);
-                    ViewParent parent = view.getParent();
-                    view = parent instanceof View ? (View) parent : null;
-                }
+                View target = stack.get(0);
                 target.getLocationInWindow(location);
                 float sampleX = location[0] + target.getWidth() / 2f;
                 float sampleY = location[1] + target.getHeight() / 2f;
-
                 pixel.eraseColor(Color.TRANSPARENT);
-                for (int index = stack.size() - 1; index >= 0; index--) {
-                    View view = stack.get(index);
-                    Drawable background = view.getBackground();
-                    if (background == null || view.getVisibility() != View.VISIBLE) {
-                        continue;
-                    }
-                    view.getLocationInWindow(location);
-                    int save = pixelCanvas.saveLayerAlpha(0, 0, 1, 1,
-                            Math.round(view.getAlpha() * OPAQUE));
-                    pixelCanvas.translate(location[0] - sampleX, location[1] - sampleY);
-                    drawWithoutBlur(background, pixelCanvas);
-                    pixelCanvas.restoreToCount(save);
-                }
+                drawStack(pixelCanvas, stack, sampleX, sampleY);
                 return pixel.getPixel(0, 0);
             } catch (Throwable ignored) {
                 return 0;
             }
+        }
+
+        /**
+         * The view holding the keyboard's body background followed by its ancestors, up to but
+         * not including InputView. Empty when the keyboard cannot be found.
+         */
+        private List<View> keyboardStack(View inputView) {
+            List<View> stack = new ArrayList<>();
+            View target = surface.get();
+            if (target == null || !target.isAttachedToWindow() || !target.isShown()) {
+                View root = inputView.getRootView();
+                target = find(root, BODY_AREA_TAG);
+                if (target == null) {
+                    target = find(root, BASE_AREA_TAG);
+                }
+                surface = new WeakReference<>(target);
+            }
+            if (target == null || target.getWidth() <= 0 || target.getHeight() <= 0) {
+                return stack;
+            }
+            for (View view = target; view != null && view != inputView; ) {
+                stack.add(view);
+                ViewParent parent = view.getParent();
+                view = parent instanceof View ? (View) parent : null;
+            }
+            return stack;
+        }
+
+        /**
+         * Paints the stack's backgrounds, outermost first, the way the keyboard draws them.
+         * The given window coordinates end up at the canvas origin.
+         */
+        private void drawStack(Canvas canvas, List<View> stack, float windowX, float windowY) {
+            int base = canvas.save();
+            for (int index = stack.size() - 1; index >= 0; index--) {
+                View view = stack.get(index);
+                if (view.getVisibility() != View.VISIBLE) {
+                    continue;
+                }
+                view.getLocationInWindow(location);
+                float left = location[0] - windowX;
+                float top = location[1] - windowY;
+                if (view.getClipToOutline()) {
+                    // Stays in effect for everything nested inside this view.
+                    clipToOutline(canvas, view, left, top);
+                }
+                Drawable background = view.getBackground();
+                if (background == null) {
+                    continue;
+                }
+                int save = canvas.saveLayerAlpha(null, Math.round(view.getAlpha() * OPAQUE));
+                canvas.translate(left, top);
+                drawWithoutBlur(background, canvas);
+                canvas.restoreToCount(save);
+            }
+            canvas.restoreToCount(base);
+        }
+
+        private static void clipToOutline(Canvas canvas, View view, float left, float top) {
+            try {
+                ViewOutlineProvider provider = view.getOutlineProvider();
+                if (provider == null) {
+                    return;
+                }
+                Outline outline = new Outline();
+                provider.getOutline(view, outline);
+                Path path = new Path();
+                Rect rect = new Rect();
+                if (outline.getRect(rect)) {
+                    float radius = Math.max(0f, outline.getRadius());
+                    path.addRoundRect(new RectF(rect), radius, radius, Path.Direction.CW);
+                } else {
+                    Field pathField = Outline.class.getDeclaredField("mPath");
+                    pathField.setAccessible(true);
+                    Path outlinePath = (Path) pathField.get(outline);
+                    if (outlinePath == null || outlinePath.isEmpty()) {
+                        return;
+                    }
+                    path.set(outlinePath);
+                }
+                path.offset(left, top);
+                canvas.clipPath(path);
+            } catch (Throwable ignored) {
+                // An outline that cannot be read is treated as not clipping.
+            }
+        }
+
+        /**
+         * Works out what the keyboard panel leaves unpainted at its two bottom corners.
+         * Each corner bitmap ends up holding the keyboard color exactly where the panel's
+         * rounded corner leaves a gap, and nothing elsewhere.
+         */
+        private void measureCorners(View inputView, int color) {
+            cornerRadiusPx = 0;
+            if (Color.alpha(color) >= OPAQUE) {
+                return;
+            }
+            List<View> stack = keyboardStack(inputView);
+            int size = Math.round(CORNER_AREA_DP
+                    * inputView.getResources().getDisplayMetrics().density);
+            int width = inputView.getWidth();
+            int stripTop = inputView.getHeight() - inputView.getPaddingBottom();
+            if (stack.isEmpty() || size <= 0 || inputView.getPaddingBottom() <= 0
+                    || width < size * 2 || stripTop < size) {
+                return;
+            }
+            if (leftCorner == null || leftCorner.getWidth() != size) {
+                leftCorner = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+                rightCorner = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+            }
+            cornerAreaPx = size;
+            inputView.getLocationInWindow(origin);
+            float top = origin[1] + stripTop - size;
+            renderCorner(leftCorner, stack, color, origin[0], top);
+            renderCorner(rightCorner, stack, color, origin[0] + width - size, top);
+
+            // The gap's height along the outer edge is the corner radius.
+            int radius = 0;
+            for (int y = size - 1; y >= 0 && Color.alpha(leftCorner.getPixel(0, y)) > 0; y--) {
+                radius++;
+            }
+            // A gap as tall as the whole area means the panel does not reach the screen edge
+            // (floating or one-handed layouts), which is not a rounded corner to fill.
+            cornerRadiusPx = radius >= size ? 0 : radius;
+        }
+
+        private void renderCorner(Bitmap corner, List<View> stack, int color,
+                float windowX, float windowY) {
+            corner.eraseColor(color);
+            Canvas canvas = new Canvas(corner);
+            int layer = canvas.saveLayer(null, cutOutPaint);
+            drawStack(canvas, stack, windowX, windowY);
+            canvas.restoreToCount(layer);
+        }
+
+        /**
+         * Squares off the keyboard panel's rounded bottom corners and moves that rounding to
+         * the bottom of the strip, so panel and strip read as one shape.
+         */
+        boolean drawSeamless(View inputView, Canvas canvas, int color) {
+            if (cornerRadiusPx <= 0 || leftCorner == null) {
+                return false;
+            }
+            int width = inputView.getWidth();
+            int height = inputView.getHeight();
+            int stripTop = height - inputView.getPaddingBottom();
+            canvas.drawBitmap(leftCorner, 0, stripTop - cornerAreaPx, null);
+            canvas.drawBitmap(rightCorner, width - cornerAreaPx, stripTop - cornerAreaPx, null);
+
+            float radius = stripCornerRadius(inputView);
+            stripPath.rewind();
+            stripPath.addRoundRect(0, stripTop, width, height,
+                    new float[]{0, 0, 0, 0, radius, radius, radius, radius}, Path.Direction.CW);
+            fillPaint.setColor(color);
+            canvas.drawPath(stripPath, fillPaint);
+            return true;
+        }
+
+        private float stripCornerRadius(View inputView) {
+            return Math.min(cornerRadiusPx, inputView.getPaddingBottom());
         }
 
         /**
@@ -316,6 +492,15 @@ public final class BottomBarOpacity {
                         * inputView.getResources().getDisplayMetrics().density);
                 int top = Math.max(0, height - inputView.getPaddingBottom() - overlap);
                 blur.setBounds(0, top, width, height);
+                try {
+                    float radius = cornerRadiusPx > 0 ? stripCornerRadius(inputView) : 0f;
+                    Method setCorners = blur.getClass().getDeclaredMethod("setCornerRadius",
+                            float.class, float.class, float.class, float.class);
+                    setCorners.setAccessible(true);
+                    setCorners.invoke(blur, 0f, 0f, radius, radius);
+                } catch (Throwable ignored) {
+                    // Square blur corners are an acceptable fallback.
+                }
                 blur.draw(canvas);
             } catch (Throwable ignored) {
                 blur = null;
@@ -341,7 +526,8 @@ public final class BottomBarOpacity {
                 View view = inputView.get();
                 // Child views are restyled without redrawing InputView, so redraw the strip
                 // whenever the keyboard no longer matches what was painted.
-                if (view != null && keyboardColor(view, cachedFallback) != drawnColor) {
+                if (view != null && (keyboardColor(view, cachedFallback) != drawnColor
+                        || cornerRadiusPx != drawnCornerRadius)) {
                     view.invalidate();
                 }
             } catch (Throwable ignored) {
