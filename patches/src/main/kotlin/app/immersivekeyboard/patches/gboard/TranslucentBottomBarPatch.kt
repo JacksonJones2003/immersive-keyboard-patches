@@ -11,8 +11,9 @@ private const val EXTENSION_CLASS = "Lapp/immersivekeyboard/extension/BottomBarO
 @Suppress("unused")
 val translucentBottomBarPatch = bytecodePatch(
     name = "Translucent Bottom Bar",
-    description = "Makes the bar under the keyboard (behind the globe and close buttons) follow " +
-        "the keyboard's opacity, for use with transparent themes such as Frosted Glass.",
+    description = "Makes the bar under the keyboard (behind the globe and close buttons) match " +
+        "the keyboard's color, opacity and blur, for use with transparent themes such as " +
+        "Frosted Glass.",
     default = true
 ) {
     compatibleWith(COMPATIBILITY_GBOARD)
@@ -37,7 +38,8 @@ val translucentBottomBarPatch = bytecodePatch(
         }
 
         // On Android 16+ Gboard paints this strip itself, in an opaque theme color, in the
-        // bottom padding of InputView. Scale that color by the keyboard surfaces' alpha.
+        // bottom padding of InputView. Replace that color with the keyboard's own color and
+        // opacity, and blur behind the strip when Frosted Glass is on.
         InputViewOnDrawFingerprint.let {
             val setColor = it.instructionMatches.first().index
             val colorRegister =
@@ -45,7 +47,7 @@ val translucentBottomBarPatch = bytecodePatch(
             it.method.addInstructions(
                 setColor,
                 """
-                    invoke-static { p0, v$colorRegister }, $EXTENSION_CLASS->stripColor(Landroid/view/View;I)I
+                    invoke-static { p0, p1, v$colorRegister }, $EXTENSION_CLASS->stripColor(Landroid/view/View;Landroid/graphics/Canvas;I)I
                     move-result v$colorRegister
                 """
             )
