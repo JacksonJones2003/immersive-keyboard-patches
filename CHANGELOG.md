@@ -1,3 +1,9 @@
+## [1.1.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.1.1...v1.1.2) (2026-10-09)
+
+### 🐛 Bug Fixes
+
+* Match the bottom bar to the keyboard's own color, layered opacity and blur ([ce38c11](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/ce38c1191261a1af92b78373b4f5f38b0ebbd4a2))
+
 ## [1.1.2-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.1.1...v1.1.2-dev.1) (2026-10-09)
 
 ### 🐛 Bug Fixes
