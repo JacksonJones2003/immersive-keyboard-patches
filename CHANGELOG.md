@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.1.4...v1.2.0) (2026-10-09)
+
+### ✨ New Features
+
+* Square off the keyboard's bottom corners and round the bottom bar instead ([a38deff](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/a38deff9bde920c33a525d8fa5297e0a4e13b342))
+
 ## [1.2.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.1.4...v1.2.0-dev.1) (2026-10-09)
 
 ### ✨ New Features
