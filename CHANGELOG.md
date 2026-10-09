@@ -1,3 +1,13 @@
+## [1.1.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.0.1...v1.1.0-dev.1) (2026-10-09)
+
+### 🐛 Bug Fixes
+
+* Include the bottom bar extension code ([587803c](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/587803cdf1d45ddb4c6e5feb6e40c2a7bf312375))
+
+### ✨ New Features
+
+* Add Translucent Bottom Bar patch for Gboard ([23752e9](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/23752e99aab69744b0981468dbca178390f66bd9))
+
 ## [1.0.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.0.0...v1.0.1) (2026-10-08)
 
 ### 🐛 Bug Fixes

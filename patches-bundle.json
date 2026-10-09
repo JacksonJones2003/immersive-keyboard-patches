@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-08T20:55:58",
-  "description": "## [1.0.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.0.0...v1.0.1) (2026-10-08)\n\n### 🐛 Bug Fixes\n\n* Enable Gboard's built-in edge-to-edge mode so the keyboard fills the cutout area ([b276e93](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/b276e9311c8814e93ab71d84b592fee8d1a4b216))",
-  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.0.1/patches-1.0.1.mpp",
+  "created_at": "2026-10-09T03:37:59",
+  "description": "## [1.1.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.0.1...v1.1.0-dev.1) (2026-10-09)\n\n### 🐛 Bug Fixes\n\n* Include the bottom bar extension code ([587803c](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/587803cdf1d45ddb4c6e5feb6e40c2a7bf312375))\n\n### ✨ New Features\n\n* Add Translucent Bottom Bar patch for Gboard ([23752e9](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/23752e99aab69744b0981468dbca178390f66bd9))",
+  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.1.0-dev.1/patches-1.1.0-dev.1.mpp",
   "signature_download_url": "",
-  "version": "1.0.1"
+  "version": "1.1.0-dev.1"
 }
