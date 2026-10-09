@@ -44,3 +44,19 @@ object ShouldIgnoreDisplayCutoutFingerprint : Fingerprint(
         )
     )
 )
+
+/**
+ * InputView.onDraw, which paints a solid strip behind the system navigation bar on Android 16+.
+ */
+object InputViewOnDrawFingerprint : Fingerprint(
+    definingClass = "Lcom/google/android/libraries/inputmethod/inputview/InputView;",
+    name = "onDraw",
+    returnType = "V",
+    parameters = listOf("Landroid/graphics/Canvas;"),
+    filters = listOf(
+        methodCall(
+            definingClass = "Landroid/graphics/Paint;",
+            name = "setColor",
+        )
+    )
+)
