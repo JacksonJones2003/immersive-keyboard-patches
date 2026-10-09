@@ -1,3 +1,9 @@
+## [1.1.1-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.1.0...v1.1.1-dev.1) (2026-10-09)
+
+### 🐛 Bug Fixes
+
+* Read the Frosted Glass opacity setting for the bottom bar instead of guessing it from drawables ([863fe31](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/863fe3130e3cf38e43cbc1126f6297d6fed14a00))
+
 ## [1.1.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.0.1...v1.1.0) (2026-10-09)
 
 ### 🐛 Bug Fixes
