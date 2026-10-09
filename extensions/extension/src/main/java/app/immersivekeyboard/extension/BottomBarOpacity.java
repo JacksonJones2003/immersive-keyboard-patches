@@ -5,6 +5,10 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
@@ -43,6 +47,10 @@ public final class BottomBarOpacity {
     private static final int FROSTED_GLASS_DEFAULT_OPACITY = 20;
     private static final int FROSTED_GLASS_DEFAULT_BLUR_STRENGTH = 20;
     private static final float FROSTED_GLASS_CORNER_RADIUS_DP = 32.0f;
+    private static final String ROUNDED_PANEL_ENABLED = "pref_rounded_keyboard_panel_enabled";
+    private static final String ROUNDED_PANEL_MODE = "pref_rounded_keyboard_panel_mode";
+    private static final String ROUNDED_PANEL_BOTTOM_RADIUS =
+            "pref_rounded_keyboard_panel_bottom_radius_dp";
 
     private static final Map<View, State> STATES = new WeakHashMap<>();
 
@@ -66,6 +74,21 @@ public final class BottomBarOpacity {
             return keyboardColor;
         } catch (Throwable ignored) {
             return color;
+        }
+    }
+
+    /**
+     * Injection point. Called from InputView.dispatchDraw once the keyboard itself has been
+     * drawn, so anything painted here lands on top of it.
+     */
+    public static void afterKeyboardDrawn(View inputView, Canvas canvas) {
+        try {
+            State state = STATES.get(inputView);
+            if (state != null) {
+                state.repaintBottomCorners(inputView, canvas);
+            }
+        } catch (Throwable ignored) {
+            // Never block drawing.
         }
     }
 
@@ -101,14 +124,19 @@ public final class BottomBarOpacity {
 
     /** The Frosted Glass settings that matter for the strip. */
     private static final class FrostedGlass {
-        static final FrostedGlass OFF = new FrostedGlass(false, -1, 0);
+        static final FrostedGlass OFF =
+                new FrostedGlass(false, -1, 0, FROSTED_GLASS_CORNER_RADIUS_DP);
 
         final boolean enabled;
         /** Alpha Frosted Glass applies to keyboard surfaces in custom mode, otherwise -1. */
         final int customAlpha;
         final int blurRadiusPx;
+        /** Radius of the rounded bottom corners of the keyboard's see-through area. */
+        final float cornerRadiusDp;
 
-        private FrostedGlass(boolean enabled, int customAlpha, int blurRadiusPx) {
+        private FrostedGlass(boolean enabled, int customAlpha, int blurRadiusPx,
+                float cornerRadiusDp) {
+            this.cornerRadiusDp = cornerRadiusDp;
             this.enabled = enabled;
             this.customAlpha = customAlpha;
             this.blurRadiusPx = blurRadiusPx;
@@ -133,7 +161,14 @@ public final class BottomBarOpacity {
                 int strength = clamp(number(values.get(FROSTED_GLASS_BLUR_STRENGTH),
                         FROSTED_GLASS_DEFAULT_BLUR_STRENGTH), 1, 100);
                 int radius = Math.round(1 + (strength - 1) * (159f / 99f));
-                return new FrostedGlass(true, customAlpha, radius);
+                // Rounded Keyboard Panel can round the same corners by more than Frosted Glass.
+                float corner = FROSTED_GLASS_CORNER_RADIUS_DP;
+                if ("true".equalsIgnoreCase(String.valueOf(values.get(ROUNDED_PANEL_ENABLED)))
+                        && !"top".equals(values.get(ROUNDED_PANEL_MODE))) {
+                    corner = Math.max(corner, clamp(number(
+                            values.get(ROUNDED_PANEL_BOTTOM_RADIUS), 32), 0, 64));
+                }
+                return new FrostedGlass(true, customAlpha, radius, corner);
             } catch (Throwable ignored) {
                 return OFF;
             }
@@ -168,6 +203,14 @@ public final class BottomBarOpacity {
         private boolean watching;
         private boolean attachListenerAdded;
         private Drawable blur;
+        private final Path cornerPath = new Path();
+        private final Path circlePath = new Path();
+        private final Paint cornerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint erasePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+        State() {
+            erasePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        }
         private WeakReference<Drawable> squaredBlur = new WeakReference<>(null);
         private boolean blurUnavailable;
 
@@ -356,6 +399,42 @@ public final class BottomBarOpacity {
         }
 
         /**
+         * The translucent, blurred part of the keyboard is a rectangle with all four corners
+         * rounded, so its two bottom corners leave small wedges of something else where the
+         * keyboard meets the strip. Erase those wedges from the finished keyboard and repaint
+         * them like the strip (blurred backdrop plus keyboard color), which makes the bottom
+         * edge of the keyboard run straight into it.
+         */
+        void repaintBottomCorners(View inputView, Canvas canvas) {
+            int padding = inputView.getPaddingBottom();
+            View keyboard = surface.get();
+            if (!settings.enabled || padding <= 0 || Color.alpha(drawnColor) >= OPAQUE
+                    || blur == null || keyboard == null
+                    // Floating and one-handed keyboards do not sit on the strip's corners.
+                    || keyboard.getWidth() < inputView.getWidth() * 0.95f) {
+                return;
+            }
+            float radius = settings.cornerRadiusDp
+                    * inputView.getResources().getDisplayMetrics().density;
+            float width = inputView.getWidth();
+            float stripTop = inputView.getHeight() - padding;
+            float top = stripTop - radius;
+
+            // Each wedge is a corner square minus the quarter circle the keyboard fills.
+            cornerPath.rewind();
+            cornerPath.addRect(0, top, radius, stripTop, Path.Direction.CW);
+            cornerPath.addRect(width - radius, top, width, stripTop, Path.Direction.CW);
+            circlePath.rewind();
+            circlePath.addCircle(radius, top, radius, Path.Direction.CW);
+            circlePath.addCircle(width - radius, top, radius, Path.Direction.CW);
+            cornerPath.op(circlePath, Path.Op.DIFFERENCE);
+
+            canvas.drawPath(cornerPath, erasePaint);
+            cornerPaint.setColor(drawnColor);
+            canvas.drawPath(cornerPath, cornerPaint);
+        }
+
+        /**
          * Blurs what is behind the strip, the way Frosted Glass blurs what is behind the keys.
          * Relies on the hidden API access Frosted Glass already enables for its own blur.
          */
@@ -386,7 +465,7 @@ public final class BottomBarOpacity {
                 // Frosted Glass rounds all four corners of its blur, which leaves the two
                 // bottom corners of the keyboard unblurred where they meet the strip. Reach up
                 // behind the keyboard by that corner radius to fill them in.
-                int overlap = Math.round(FROSTED_GLASS_CORNER_RADIUS_DP
+                int overlap = Math.round(settings.cornerRadiusDp
                         * inputView.getResources().getDisplayMetrics().density);
                 int top = Math.max(0, height - inputView.getPaddingBottom() - overlap);
                 blur.setBounds(0, top, width, height);

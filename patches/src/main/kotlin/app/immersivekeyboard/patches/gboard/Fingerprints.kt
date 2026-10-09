@@ -78,3 +78,16 @@ object ApplyNavigationBarColorFingerprint : Fingerprint(
         )
     )
 )
+
+/**
+ * InputView.dispatchDraw, which draws the whole keyboard through its super call.
+ */
+object InputViewDispatchDrawFingerprint : Fingerprint(
+    definingClass = "Lcom/google/android/libraries/inputmethod/inputview/InputView;",
+    name = "dispatchDraw",
+    returnType = "V",
+    parameters = listOf("Landroid/graphics/Canvas;"),
+    filters = listOf(
+        methodCall(name = "dispatchDraw")
+    )
+)

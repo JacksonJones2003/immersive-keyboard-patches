@@ -52,5 +52,16 @@ val translucentBottomBarPatch = bytecodePatch(
                 """
             )
         }
+
+        // Once the keyboard has drawn, fix up its bottom corners where they meet the strip.
+        // The parameter registers are reused right after the super call, so hook directly
+        // behind it.
+        InputViewDispatchDrawFingerprint.let {
+            it.method.addInstructions(
+                it.instructionMatches.first().index + 1,
+                "invoke-static { p0, p1 }, " +
+                    "$EXTENSION_CLASS->afterKeyboardDrawn(Landroid/view/View;Landroid/graphics/Canvas;)V"
+            )
+        }
     }
 }
