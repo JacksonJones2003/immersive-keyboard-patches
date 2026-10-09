@@ -73,6 +73,7 @@ public final class BottomBarOpacity {
                 return color;
             }
             state.drawBlur(inputView, canvas);
+            state.drawGlassBehind(inputView, canvas);
             return keyboardColor;
         } catch (Throwable ignored) {
             return color;
@@ -89,6 +90,7 @@ public final class BottomBarOpacity {
             if (state != null) {
                 state.repaintBottomCorners(inputView, canvas);
                 state.repaintTopCorners(inputView, canvas);
+                state.drawGlassOnTop(inputView, canvas);
             }
         } catch (Throwable ignored) {
             // Never block drawing.
@@ -552,6 +554,25 @@ public final class BottomBarOpacity {
             } catch (Throwable ignored) {
                 return 0;
             }
+        }
+
+        /** Glass Panel effect under the keyboard, when that patch is applied. */
+        void drawGlassBehind(View inputView, Canvas canvas) {
+            if (!GlassPanel.isEnabled() || !settings.enabled || keyboardTop == NO_TOP) {
+                return;
+            }
+            GlassPanel.drawBehind(canvas, 0, topInInputView(inputView), inputView.getWidth(),
+                    inputView.getHeight(), inputView.getResources().getDisplayMetrics().density);
+        }
+
+        /** Glass Panel rim over the finished keyboard, when that patch is applied. */
+        void drawGlassOnTop(View inputView, Canvas canvas) {
+            if (!GlassPanel.isEnabled() || !settings.enabled || keyboardTop == NO_TOP
+                    || Color.alpha(drawnColor) >= OPAQUE) {
+                return;
+            }
+            GlassPanel.drawOnTop(canvas, 0, topInInputView(inputView), inputView.getWidth(),
+                    inputView.getResources().getDisplayMetrics().density);
         }
 
         /**
