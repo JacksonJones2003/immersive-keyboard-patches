@@ -18,7 +18,7 @@ Click here to add these patches to Morphe: https://morphe.software/add-source?gi
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.1.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/tag/v1.1.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;2 patches total
+> **[v1.1.2-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/tag/v1.1.2-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;2 patches total
 <details open>
 <summary>📦 Gboard&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
 <br>
@@ -31,7 +31,7 @@ Click here to add these patches to Morphe: https://morphe.software/add-source?gi
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Immersive Keyboard](#immersive-keyboard) | Extends the keyboard under the camera cutout in landscape instead of leaving an empty strip beside it. |  |
-| [Translucent Bottom Bar](#translucent-bottom-bar) | Makes the bar under the keyboard (behind the globe and close buttons) follow the keyboard's opacity, for use with transparent themes such as Frosted Glass. |  |
+| [Translucent Bottom Bar](#translucent-bottom-bar) | Makes the bar under the keyboard (behind the globe and close buttons) match the keyboard's color, opacity and blur, for use with transparent themes such as Frosted Glass. |  |
 
 </details>
 

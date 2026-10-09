@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.1.1",
+  "version": "1.1.2-dev.1",
   "patches": [
     {
       "name": "Immersive Keyboard",
@@ -38,7 +38,7 @@
     },
     {
       "name": "Translucent Bottom Bar",
-      "description": "Makes the bar under the keyboard (behind the globe and close buttons) follow the keyboard's opacity, for use with transparent themes such as Frosted Glass.",
+      "description": "Makes the bar under the keyboard (behind the globe and close buttons) match the keyboard's color, opacity and blur, for use with transparent themes such as Frosted Glass.",
       "default": true,
       "category": null,
       "dependencies": [],
