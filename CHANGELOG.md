@@ -1,3 +1,9 @@
+## [1.2.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.2.1...v1.2.2) (2026-10-09)
+
+### 🐛 Bug Fixes
+
+* Repaint the keyboard's bottom corners on top of the keyboard so they blend into the bottom bar ([7bf932a](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/7bf932a45b50cc490d3493610402ecbb9be735d1))
+
 ## [1.2.2-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.2.1...v1.2.2-dev.1) (2026-10-09)
 
 ### 🐛 Bug Fixes
