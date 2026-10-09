@@ -1,3 +1,9 @@
+## [1.3.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.2.2...v1.3.0-dev.1) (2026-10-09)
+
+### ✨ New Features
+
+* Square off the keyboard's top corners and add Emoji Key On Right patch ([4a56910](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/4a56910fc17a96d328c7e4443682ed724d138fee))
+
 ## [1.2.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.2.1...v1.2.2) (2026-10-09)
 
 ### 🐛 Bug Fixes

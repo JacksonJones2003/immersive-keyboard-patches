@@ -18,9 +18,9 @@ Click here to add these patches to Morphe: https://morphe.software/add-source?gi
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.2.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/tag/v1.2.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;2 patches total
+> **[v1.3.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/tag/v1.3.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;3 patches total
 <details open>
-<summary>📦 Gboard&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<summary>📦 Gboard&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -30,6 +30,7 @@ Click here to add these patches to Morphe: https://morphe.software/add-source?gi
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
+| [Emoji Key On Right](#emoji-key-on-right) | Moves the dedicated emoji key from the left of the spacebar to its right. |  |
 | [Immersive Keyboard](#immersive-keyboard) | Extends the keyboard under the camera cutout in landscape instead of leaving an empty strip beside it. |  |
 | [Translucent Bottom Bar](#translucent-bottom-bar) | Makes the bar under the keyboard (behind the globe and close buttons) match the keyboard's color, opacity and blur, for use with transparent themes such as Frosted Glass. |  |
 
