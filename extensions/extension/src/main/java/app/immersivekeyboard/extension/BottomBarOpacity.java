@@ -255,9 +255,8 @@ public final class BottomBarOpacity {
         }
 
         /**
-         * Paints the backgrounds stacked under the keys into a single pixel, in the order the
-         * keyboard draws them, and returns the result. Whatever the theme and Frosted Glass
-         * did to those backgrounds (color, alpha, layering) is reflected in that pixel.
+         * Color and opacity of the keyboard in the row of pixels directly above the strip,
+         * which is what the strip has to match for the join to be invisible.
          */
         private int sampleKeyboard(View inputView) {
             try {
@@ -273,50 +272,62 @@ public final class BottomBarOpacity {
                 if (target == null || target.getWidth() <= 0 || target.getHeight() <= 0) {
                     return 0;
                 }
-                List<View> stack = new ArrayList<>();
-                for (View view = target; view != null && view != inputView; ) {
-                    stack.add(view);
-                    ViewParent parent = view.getParent();
-                    view = parent instanceof View ? (View) parent : null;
-                }
-                target.getLocationInWindow(location);
-                float sampleX = location[0] + target.getWidth() / 2f;
-                float sampleY = location[1] + target.getHeight() / 2f;
-                // Panels nested inside the body surface add their own tint over it. Follow
-                // them down, stopping before individual keys.
-                List<View> nested = new ArrayList<>();
-                View current = target;
-                while (current instanceof ViewGroup) {
-                    View next = panelAt((ViewGroup) current, sampleX, sampleY,
-                            target.getWidth() * 0.8f);
-                    if (next == null) {
-                        break;
-                    }
-                    nested.add(next);
-                    current = next;
-                }
-                for (View view : nested) {
-                    stack.add(0, view);
-                }
-
-                pixel.eraseColor(Color.TRANSPARENT);
-                for (int index = stack.size() - 1; index >= 0; index--) {
-                    View view = stack.get(index);
-                    Drawable background = view.getBackground();
-                    if (background == null || view.getVisibility() != View.VISIBLE) {
-                        continue;
-                    }
-                    view.getLocationInWindow(location);
-                    int save = pixelCanvas.saveLayerAlpha(0, 0, 1, 1,
-                            Math.round(view.getAlpha() * OPAQUE));
-                    pixelCanvas.translate(location[0] - sampleX, location[1] - sampleY);
-                    drawWithoutBlur(background, pixelCanvas);
-                    pixelCanvas.restoreToCount(save);
-                }
-                return pixel.getPixel(0, 0);
+                inputView.getLocationInWindow(origin);
+                float density = inputView.getResources().getDisplayMetrics().density;
+                float sampleX = origin[0] + inputView.getWidth() / 2f;
+                float sampleY = inputView.getPaddingBottom() > 0
+                        ? origin[1] + inputView.getHeight() - inputView.getPaddingBottom()
+                                - 2f * density
+                        : origin[1] + inputView.getHeight() - 2f * density;
+                return sampleAt(inputView, sampleX, sampleY);
             } catch (Throwable ignored) {
                 return 0;
             }
+        }
+
+        /**
+         * Paints, into a single pixel, every panel background that covers the given window
+         * point, in the order the keyboard draws them. Whatever the theme and Frosted Glass
+         * did to those backgrounds (color, alpha, layering) is reflected in the result.
+         */
+        private int sampleAt(View inputView, float windowX, float windowY) {
+            pixel.eraseColor(Color.TRANSPARENT);
+            paintPanels(inputView, windowX, windowY, inputView.getWidth() * 0.8f);
+            return pixel.getPixel(0, 0);
+        }
+
+        /**
+         * Walks the keyboard in drawing order. Only views spanning most of its width count as
+         * panels, which leaves out individual keys and anything inside them.
+         */
+        private void paintPanels(View view, float windowX, float windowY, float minWidth) {
+            if (view.getVisibility() != View.VISIBLE || view.getWidth() < minWidth
+                    || view.getAlpha() <= 0f) {
+                return;
+            }
+            view.getLocationInWindow(location);
+            int left = location[0];
+            int top = location[1];
+            if (windowX < left || windowX >= left + view.getWidth()
+                    || windowY < top || windowY >= top + view.getHeight()) {
+                return;
+            }
+            int save = pixelCanvas.saveLayerAlpha(0, 0, 1, 1,
+                    Math.round(view.getAlpha() * OPAQUE));
+            Drawable background = view.getBackground();
+            if (background != null) {
+                int inner = pixelCanvas.save();
+                pixelCanvas.translate(left - windowX, top - windowY);
+                drawWithoutBlur(background, pixelCanvas);
+                pixelCanvas.restoreToCount(inner);
+            }
+            if (view instanceof ViewGroup) {
+                ViewGroup group = (ViewGroup) view;
+                for (int index = 0; index < group.getChildCount(); index++) {
+                    paintPanels(group.getChildAt(index), windowX, windowY, minWidth);
+                }
+            }
+            pixelCanvas.restoreToCount(save);
         }
 
         /**
@@ -518,39 +529,13 @@ public final class BottomBarOpacity {
         }
 
         /** Color of the keyboard just inside its top edge, where the top corners are. */
-        private int sampleTop(View panel) {
+        private int sampleTop(View inputView) {
             try {
                 float radius = settings.cornerRadiusDp
-                        * panel.getResources().getDisplayMetrics().density;
-                panel.getLocationInWindow(location);
-                float sampleX = location[0] + panel.getWidth() / 2f;
-                float sampleY = keyboardTop + radius / 2f;
-                List<View> stack = new ArrayList<>();
-                stack.add(panel);
-                View current = panel;
-                while (current instanceof ViewGroup) {
-                    View next = panelAt((ViewGroup) current, sampleX, sampleY,
-                            panel.getWidth() * 0.8f);
-                    if (next == null) {
-                        break;
-                    }
-                    stack.add(next);
-                    current = next;
-                }
-                pixel.eraseColor(Color.TRANSPARENT);
-                for (View view : stack) {
-                    Drawable background = view.getBackground();
-                    if (background == null) {
-                        continue;
-                    }
-                    view.getLocationInWindow(location);
-                    int save = pixelCanvas.saveLayerAlpha(0, 0, 1, 1,
-                            Math.round(view.getAlpha() * OPAQUE));
-                    pixelCanvas.translate(location[0] - sampleX, location[1] - sampleY);
-                    drawWithoutBlur(background, pixelCanvas);
-                    pixelCanvas.restoreToCount(save);
-                }
-                return pixel.getPixel(0, 0);
+                        * inputView.getResources().getDisplayMetrics().density;
+                inputView.getLocationInWindow(origin);
+                return sampleAt(inputView, origin[0] + inputView.getWidth() / 2f,
+                        keyboardTop + radius / 2f);
             } catch (Throwable ignored) {
                 return 0;
             }
@@ -678,22 +663,6 @@ public final class BottomBarOpacity {
             blur = null;
             topBlur = null;
             blurUnavailable = false;
-        }
-
-        /** A visible child spanning most of the keyboard's width that covers the point. */
-        private View panelAt(ViewGroup parent, float windowX, float windowY, float minWidth) {
-            for (int index = parent.getChildCount() - 1; index >= 0; index--) {
-                View child = parent.getChildAt(index);
-                if (child.getVisibility() != View.VISIBLE || child.getWidth() < minWidth) {
-                    continue;
-                }
-                child.getLocationInWindow(location);
-                if (windowX >= location[0] && windowX < location[0] + child.getWidth()
-                        && windowY >= location[1] && windowY < location[1] + child.getHeight()) {
-                    return child;
-                }
-            }
-            return null;
         }
 
         private static View find(View view, String tag) {
