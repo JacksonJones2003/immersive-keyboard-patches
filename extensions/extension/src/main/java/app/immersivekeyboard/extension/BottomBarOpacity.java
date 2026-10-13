@@ -13,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -37,6 +38,8 @@ public final class BottomBarOpacity {
     private static final String HEADER_AREA_TAG = ".keyboard-header-area";
     private static final int NO_TOP = Integer.MAX_VALUE;
     private static final int OPAQUE = 255;
+    private static final String TAG = "ImmersiveKB";
+    private static final String DUMP_TAG = "ImmersiveKBDump";
     private static final long REFRESH_INTERVAL_MS = 150;
 
     // Settings written by the Frosted Glass patch from jasonwu1994/Gboard-patches.
@@ -69,6 +72,8 @@ public final class BottomBarOpacity {
             state.watch(inputView);
             int keyboardColor = state.keyboardColor(inputView, color);
             state.drawnColor = keyboardColor;
+            state.drawnKeyboardTop = state.keyboardTop;
+            state.drawnBlurSquared = state.blurSquared;
             if (Color.alpha(keyboardColor) >= OPAQUE) {
                 return color;
             }
@@ -221,6 +226,12 @@ public final class BottomBarOpacity {
             erasePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         }
         private WeakReference<Drawable> squaredBlur = new WeakReference<>(null);
+        /** Whether the keyboard's own blur currently has square corners. */
+        private boolean blurSquared;
+        private int drawnKeyboardTop = NO_TOP;
+        private boolean drawnBlurSquared;
+        private String lastLoggedState = "";
+        private boolean dumpRequested;
         private boolean blurUnavailable;
 
         /**
@@ -235,7 +246,7 @@ public final class BottomBarOpacity {
             lastRefresh = now;
             cachedFallback = fallback;
             settings = FrostedGlass.read(inputView.getContext());
-            squareKeyboardBlurBottom(inputView);
+            squareKeyboardBlur(inputView);
             keyboardTop = findKeyboardTop(inputView);
             topColor = keyboardTop == NO_TOP ? 0 : sampleTop(inputView);
             int sampled = sampleKeyboard(inputView);
@@ -251,7 +262,86 @@ public final class BottomBarOpacity {
             } else {
                 cachedColor = fallback;
             }
+            report(inputView, sampled);
             return cachedColor;
+        }
+
+        /** Logs what was found whenever it changes, and a full layer dump on request. */
+        private void report(View inputView, int sampled) {
+            try {
+                String stateLine = "enabled=" + settings.enabled
+                        + " customAlpha=" + settings.customAlpha
+                        + " blurRadius=" + settings.blurRadiusPx
+                        + " squared=" + blurSquared
+                        + " top=" + (keyboardTop == NO_TOP ? "none" : String.valueOf(keyboardTop))
+                        + " sampled=#" + Integer.toHexString(sampled)
+                        + " strip=#" + Integer.toHexString(cachedColor)
+                        + " topColor=#" + Integer.toHexString(topColor)
+                        + " padding=" + inputView.getPaddingBottom()
+                        + " size=" + inputView.getWidth() + "x" + inputView.getHeight()
+                        + " stripBlur=" + (blur != null) + " glass=" + GlassPanel.isEnabled();
+                if (!stateLine.equals(lastLoggedState)) {
+                    lastLoggedState = stateLine;
+                    Log.i(TAG, stateLine);
+                }
+                // adb shell setprop log.tag.ImmersiveKBDump DEBUG
+                boolean wanted = Log.isLoggable(DUMP_TAG, Log.DEBUG);
+                if (wanted && !dumpRequested) {
+                    Log.i(TAG, "---- layer dump ----");
+                    dump(inputView.getRootView(), 0);
+                    Log.i(TAG, "---- end of dump ----");
+                }
+                dumpRequested = wanted;
+            } catch (Throwable ignored) {
+                // Diagnostics must never affect drawing.
+            }
+        }
+
+        private void dump(View view, int depth) {
+            if (view.getWidth() < 200 && depth > 3) {
+                return;
+            }
+            view.getLocationInWindow(location);
+            StringBuilder line = new StringBuilder();
+            for (int index = 0; index < depth; index++) {
+                line.append(' ');
+            }
+            line.append(view.getClass().getName())
+                    .append(" [").append(location[0]).append(',').append(location[1]).append(' ')
+                    .append(view.getWidth()).append('x').append(view.getHeight()).append(']')
+                    .append(" vis=").append(view.getVisibility())
+                    .append(" alpha=").append(view.getAlpha())
+                    .append(" elev=").append(view.getElevation())
+                    .append(" clip=").append(view.getClipToOutline())
+                    .append(" pad=").append(view.getPaddingLeft()).append(',')
+                    .append(view.getPaddingTop()).append(',').append(view.getPaddingRight())
+                    .append(',').append(view.getPaddingBottom())
+                    .append(" tag=").append(view.getTag())
+                    .append(" bg=").append(describe(view.getBackground(), 0));
+            Log.i(TAG, line.toString());
+            if (view instanceof ViewGroup) {
+                ViewGroup group = (ViewGroup) view;
+                for (int index = 0; index < group.getChildCount(); index++) {
+                    dump(group.getChildAt(index), depth + 1);
+                }
+            }
+        }
+
+        private static String describe(Drawable drawable, int depth) {
+            if (drawable == null) {
+                return "null";
+            }
+            StringBuilder text = new StringBuilder(drawable.getClass().getName())
+                    .append("(alpha=").append(drawable.getAlpha())
+                    .append(" bounds=").append(drawable.getBounds().toShortString());
+            if (drawable instanceof LayerDrawable && depth < 3) {
+                LayerDrawable layers = (LayerDrawable) drawable;
+                for (int index = 0; index < layers.getNumberOfLayers(); index++) {
+                    text.append(" L").append(index).append('=')
+                            .append(describe(layers.getDrawable(index), depth + 1));
+                }
+            }
+            return text.append(')').toString();
         }
 
         /**
@@ -366,28 +456,34 @@ public final class BottomBarOpacity {
 
         /**
          * Frosted Glass rounds all four corners of the blur it puts on the keyboard panel.
-         * Outside those rounded corners the panel's original solid background stays visible,
-         * which shows up as a dark wedge in each corner. The bottom two sit right on the
-         * strip, so make the bottom of that blur square and let it cover them.
+         * That blur also clears the panel's solid base background, so outside the rounded
+         * corners the base color is left showing as a solid wedge in each corner. Giving the
+         * blur square corners makes it clear the whole panel.
          */
-        private void squareKeyboardBlurBottom(View inputView) {
+        private void squareKeyboardBlur(View inputView) {
             if (!settings.enabled) {
+                blurSquared = false;
                 return;
             }
             try {
                 Drawable keyboardBlur = findBlur(inputView.getRootView());
-                if (keyboardBlur == null || keyboardBlur == squaredBlur.get()) {
+                if (keyboardBlur == null) {
+                    blurSquared = false;
                     return;
                 }
-                float radius = FROSTED_GLASS_CORNER_RADIUS_DP
-                        * inputView.getResources().getDisplayMetrics().density;
+                if (keyboardBlur == squaredBlur.get()) {
+                    return;
+                }
                 Method setCorners = keyboardBlur.getClass().getDeclaredMethod("setCornerRadius",
                         float.class, float.class, float.class, float.class);
                 setCorners.setAccessible(true);
-                setCorners.invoke(keyboardBlur, radius, radius, 0f, 0f);
+                setCorners.invoke(keyboardBlur, 0f, 0f, 0f, 0f);
                 squaredBlur = new WeakReference<>(keyboardBlur);
-            } catch (Throwable ignored) {
-                // Leave the keyboard's blur as Frosted Glass made it.
+                blurSquared = true;
+                Log.i(TAG, "squared keyboard blur " + keyboardBlur.getClass().getName());
+            } catch (Throwable failure) {
+                blurSquared = false;
+                Log.w(TAG, "could not square keyboard blur", failure);
             }
         }
 
@@ -430,7 +526,8 @@ public final class BottomBarOpacity {
         void repaintBottomCorners(View inputView, Canvas canvas) {
             int padding = inputView.getPaddingBottom();
             View keyboard = surface.get();
-            if (!settings.enabled || padding <= 0 || Color.alpha(drawnColor) >= OPAQUE
+            if (blurSquared || !settings.enabled || padding <= 0
+                    || Color.alpha(drawnColor) >= OPAQUE
                     || blur == null || keyboard == null
                     // Floating and one-handed keyboards do not sit on the strip's corners.
                     || keyboard.getWidth() < inputView.getWidth() * 0.95f) {
@@ -463,7 +560,7 @@ public final class BottomBarOpacity {
          */
         void repaintTopCorners(View inputView, Canvas canvas) {
             View keyboard = surface.get();
-            if (!settings.enabled || topBlur == null || keyboard == null
+            if (blurSquared || !settings.enabled || topBlur == null || keyboard == null
                     || Color.alpha(drawnColor) >= OPAQUE
                     || keyboard.getWidth() < inputView.getWidth() * 0.95f) {
                 return;
@@ -597,14 +694,14 @@ public final class BottomBarOpacity {
                 // Frosted Glass rounds all four corners of its blur, which leaves the two
                 // bottom corners of the keyboard unblurred where they meet the strip. Reach up
                 // behind the keyboard by that corner radius to fill them in.
-                int overlap = Math.round(settings.cornerRadiusDp
+                int overlap = blurSquared ? 0 : Math.round(settings.cornerRadiusDp
                         * inputView.getResources().getDisplayMetrics().density);
                 int top = Math.max(0, height - inputView.getPaddingBottom() - overlap);
                 blur.setBounds(0, top, width, height);
                 blur.draw(canvas);
 
                 // A second blur region behind the keyboard's top corners.
-                if (keyboardTop != NO_TOP) {
+                if (keyboardTop != NO_TOP && !blurSquared) {
                     if (topBlur == null) {
                         Method getRoot = View.class.getDeclaredMethod("getViewRootImpl");
                         getRoot.setAccessible(true);
@@ -645,7 +742,10 @@ public final class BottomBarOpacity {
                 View view = inputView.get();
                 // Child views are restyled without redrawing InputView, so redraw the strip
                 // whenever the keyboard no longer matches what was painted.
-                if (view != null && keyboardColor(view, cachedFallback) != drawnColor) {
+                // The same goes for the keyboard's top edge and blur, which are often only
+                // known a moment after the keyboard first appears.
+                if (view != null && (keyboardColor(view, cachedFallback) != drawnColor
+                        || keyboardTop != drawnKeyboardTop || blurSquared != drawnBlurSquared)) {
                     view.invalidate();
                 }
             } catch (Throwable ignored) {
