@@ -1,3 +1,9 @@
+## [1.4.4](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.4.3...v1.4.4) (2026-10-13)
+
+### 🐛 Bug Fixes
+
+* Allow blur options to be tried over adb through debug properties ([edfecea](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/edfecea60521b4f1920d300a2a640ad8724921c2))
+
 ## [1.4.4-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.4.3...v1.4.4-dev.1) (2026-10-13)
 
 ### 🐛 Bug Fixes
