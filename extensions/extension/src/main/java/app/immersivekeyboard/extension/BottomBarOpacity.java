@@ -232,6 +232,7 @@ public final class BottomBarOpacity {
         private boolean drawnBlurSquared;
         private String lastLoggedState = "";
         private boolean dumpRequested;
+        private String lastTuningKey = "";
         private boolean blurUnavailable;
 
         /**
@@ -263,7 +264,65 @@ public final class BottomBarOpacity {
                 cachedColor = fallback;
             }
             report(inputView, sampled);
+            applyLiveTuning(inputView);
             return cachedColor;
+        }
+
+        /**
+         * Development aid: re-applies the calls set in debug.ikb.* system properties to the
+         * keyboard's blur, the strip's blur and the keyboard panel view whenever the calls
+         * or those objects change.
+         */
+        private void applyLiveTuning(View inputView) {
+            try {
+                List<String> drawableSpecs = LiveTuning.specs("d");
+                List<String> viewSpecs = LiveTuning.specs("v");
+                Drawable keyboardBlur = findBlur(inputView.getRootView());
+                View panel = surface.get();
+                String key = drawableSpecs + "|" + viewSpecs + "|"
+                        + System.identityHashCode(keyboardBlur) + "|"
+                        + System.identityHashCode(blur) + "|" + System.identityHashCode(panel);
+                if (key.equals(lastTuningKey)) {
+                    return;
+                }
+                lastTuningKey = key;
+                if (drawableSpecs.isEmpty() && viewSpecs.isEmpty()) {
+                    return;
+                }
+                String target = LiveTuning.property("debug.ikb.target");
+                if (!"s".equals(target)) {
+                    LiveTuning.apply(keyboardBlur, drawableSpecs);
+                    refresh(keyboardBlur);
+                }
+                if (!"k".equals(target)) {
+                    LiveTuning.apply(blur, drawableSpecs);
+                    refresh(blur);
+                }
+                LiveTuning.apply(panel, viewSpecs);
+                inputView.invalidate();
+            } catch (Throwable failure) {
+                Log.w(TAG, "live tuning failed", failure);
+            }
+        }
+
+        /** Makes a blur drawable push its current settings to the compositor. */
+        private static void refresh(Drawable blurDrawable) {
+            if (blurDrawable == null) {
+                return;
+            }
+            try {
+                java.lang.reflect.Field field =
+                        blurDrawable.getClass().getDeclaredField("mAggregator");
+                field.setAccessible(true);
+                Object aggregator = field.get(blurDrawable);
+                Method updated = aggregator.getClass().getDeclaredMethod(
+                        "onBlurDrawableUpdated", blurDrawable.getClass());
+                updated.setAccessible(true);
+                updated.invoke(aggregator, blurDrawable);
+                blurDrawable.invalidateSelf();
+            } catch (Throwable failure) {
+                Log.w(TAG, "blur refresh failed: " + failure);
+            }
         }
 
         /** Logs what was found whenever it changes, and a full layer dump on request. */
