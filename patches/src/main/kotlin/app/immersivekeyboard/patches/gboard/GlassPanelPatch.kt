@@ -9,8 +9,9 @@ private const val EXTENSION_CLASS = "Lapp/immersivekeyboard/extension/GlassPanel
 @Suppress("unused")
 val glassPanelPatch = bytecodePatch(
     name = "Glass Panel",
-    description = "Gives the translucent keyboard panel a glass look with lit edges, a faint " +
-        "sheen and a bright top rim, leaving the keys as they are. Works on top of " +
+    description = "Turns the translucent keyboard panel into glass. On vivo OriginOS it uses " +
+        "the system's own glass material, with real refraction, rim light and dispersion; " +
+        "elsewhere it draws lit edges and a sheen. Keys are left as they are. Works on top of " +
         "Translucent Bottom Bar and Frosted Glass.",
     default = true
 ) {

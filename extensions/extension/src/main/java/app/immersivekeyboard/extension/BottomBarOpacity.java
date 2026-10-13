@@ -74,6 +74,7 @@ public final class BottomBarOpacity {
             state.drawnColor = keyboardColor;
             state.drawnKeyboardTop = state.keyboardTop;
             state.drawnBlurSquared = state.blurSquared;
+            state.drawnSystemGlass = state.systemGlass;
             if (Color.alpha(keyboardColor) >= OPAQUE) {
                 return color;
             }
@@ -233,6 +234,13 @@ public final class BottomBarOpacity {
         private String lastLoggedState = "";
         private boolean dumpRequested;
         private String lastTuningKey = "";
+        /** Whether the keyboard's blur is running the system's own glass material. */
+        private boolean systemGlass;
+        private boolean drawnSystemGlass;
+        private WeakReference<Drawable> glassBlur = new WeakReference<>(null);
+        private boolean glassDark;
+        private int glassBottom = Integer.MIN_VALUE;
+        private int glassNaturalBottom;
         private boolean blurUnavailable;
 
         /**
@@ -263,9 +271,63 @@ public final class BottomBarOpacity {
             } else {
                 cachedColor = fallback;
             }
+            applySystemGlass(inputView);
             report(inputView, sampled);
             applyLiveTuning(inputView);
             return cachedColor;
+        }
+
+        /**
+         * With the Glass Panel patch on a system that has a real glass material, switches
+         * that material on for the keyboard's blur and stretches the blur down over the
+         * bottom strip, so keyboard and strip are one sheet of glass with one rim.
+         */
+        private void applySystemGlass(View inputView) {
+            try {
+                Drawable keyboardBlur = settings.enabled && GlassPanel.isEnabled()
+                        ? findBlur(inputView.getRootView()) : null;
+                View keyboard = surface.get();
+                boolean docked = keyboard != null
+                        && keyboard.getWidth() >= inputView.getWidth() * 0.95f;
+                if (keyboardBlur == null || !docked) {
+                    systemGlass = false;
+                    return;
+                }
+                boolean dark = luminance(cachedColor) < 0.5f;
+                if (keyboardBlur != glassBlur.get() || dark != glassDark) {
+                    systemGlass = GlassPanel.applySystemGlass(keyboardBlur, dark);
+                    glassBlur = new WeakReference<>(keyboardBlur);
+                    glassDark = dark;
+                    glassBottom = Integer.MIN_VALUE;
+                    if (systemGlass) {
+                        refresh(keyboardBlur);
+                        Log.i(TAG, "system glass on, dark=" + dark);
+                    }
+                }
+                if (!systemGlass) {
+                    return;
+                }
+                // The blur is sized to the keyboard panel whenever that is laid out; add the
+                // strip's height back each time that happens.
+                android.graphics.Rect bounds = keyboardBlur.getBounds();
+                if (bounds.bottom != glassBottom) {
+                    glassNaturalBottom = bounds.bottom;
+                }
+                int wanted = glassNaturalBottom + inputView.getPaddingBottom();
+                if (bounds.bottom != wanted) {
+                    keyboardBlur.setBounds(bounds.left, bounds.top, bounds.right, wanted);
+                    refresh(keyboardBlur);
+                }
+                glassBottom = wanted;
+            } catch (Throwable failure) {
+                systemGlass = false;
+                Log.w(TAG, "system glass failed", failure);
+            }
+        }
+
+        private static float luminance(int color) {
+            return (0.299f * Color.red(color) + 0.587f * Color.green(color)
+                    + 0.114f * Color.blue(color)) / 255f;
         }
 
         /**
@@ -338,7 +400,8 @@ public final class BottomBarOpacity {
                         + " topColor=#" + Integer.toHexString(topColor)
                         + " padding=" + inputView.getPaddingBottom()
                         + " size=" + inputView.getWidth() + "x" + inputView.getHeight()
-                        + " stripBlur=" + (blur != null) + " glass=" + GlassPanel.isEnabled();
+                        + " stripBlur=" + (blur != null) + " glass=" + GlassPanel.isEnabled()
+                        + " systemGlass=" + systemGlass;
                 if (!stateLine.equals(lastLoggedState)) {
                     lastLoggedState = stateLine;
                     Log.i(TAG, stateLine);
@@ -705,7 +768,8 @@ public final class BottomBarOpacity {
 
         /** Glass Panel effect under the keyboard, when that patch is applied. */
         void drawGlassBehind(View inputView, Canvas canvas) {
-            if (!GlassPanel.isEnabled() || !settings.enabled || keyboardTop == NO_TOP) {
+            if (systemGlass || !GlassPanel.isEnabled() || !settings.enabled
+                    || keyboardTop == NO_TOP) {
                 return;
             }
             GlassPanel.drawBehind(canvas, 0, topInInputView(inputView), inputView.getWidth(),
@@ -714,8 +778,8 @@ public final class BottomBarOpacity {
 
         /** Glass Panel rim over the finished keyboard, when that patch is applied. */
         void drawGlassOnTop(View inputView, Canvas canvas) {
-            if (!GlassPanel.isEnabled() || !settings.enabled || keyboardTop == NO_TOP
-                    || Color.alpha(drawnColor) >= OPAQUE) {
+            if (systemGlass || !GlassPanel.isEnabled() || !settings.enabled
+                    || keyboardTop == NO_TOP || Color.alpha(drawnColor) >= OPAQUE) {
                 return;
             }
             GlassPanel.drawOnTop(canvas, 0, topInInputView(inputView), inputView.getWidth(),
@@ -729,6 +793,10 @@ public final class BottomBarOpacity {
         void drawBlur(View inputView, Canvas canvas) {
             if (!settings.enabled || blurUnavailable || Build.VERSION.SDK_INT < 31
                     || !canvas.isHardwareAccelerated()) {
+                return;
+            }
+            if (systemGlass) {
+                // The keyboard's own blur covers the strip; a second region would show a seam.
                 return;
             }
             try {
@@ -804,7 +872,8 @@ public final class BottomBarOpacity {
                 // The same goes for the keyboard's top edge and blur, which are often only
                 // known a moment after the keyboard first appears.
                 if (view != null && (keyboardColor(view, cachedFallback) != drawnColor
-                        || keyboardTop != drawnKeyboardTop || blurSquared != drawnBlurSquared)) {
+                        || keyboardTop != drawnKeyboardTop || blurSquared != drawnBlurSquared
+                        || systemGlass != drawnSystemGlass)) {
                     view.invalidate();
                 }
             } catch (Throwable ignored) {

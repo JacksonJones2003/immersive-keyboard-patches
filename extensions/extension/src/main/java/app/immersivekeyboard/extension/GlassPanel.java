@@ -5,6 +5,9 @@ import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Shader;
+import android.graphics.drawable.Drawable;
+
+import java.util.Arrays;
 
 /**
  * Gives the translucent keyboard panel a glass look: light caught along its edges, a faint
@@ -34,6 +37,35 @@ public final class GlassPanel {
 
     static boolean isEnabled() {
         return enabled;
+    }
+
+    // vivo's widget materials, which are what make its compositor run the glass shader.
+    private static final int VIVO_MATERIAL_LIGHT = 201;
+    private static final int VIVO_MATERIAL_DARK = 251;
+
+    /**
+     * Turns on the real glass material that vivo's OriginOS builds into its window blur:
+     * the compositor refracts what is behind the edges, adds rim light and a little color
+     * dispersion. The values are the ones vivo's own text magnifier uses. Returns false on
+     * systems whose blur has no such options, where the drawn imitation is used instead.
+     */
+    static boolean applySystemGlass(Drawable blur, boolean dark) {
+        if (!enabled || blur == null) {
+            return false;
+        }
+        try {
+            blur.getClass().getDeclaredMethod("setGlassEffect", float.class, float.class);
+            blur.getClass().getDeclaredMethod("setStyle", int.class);
+        } catch (Throwable missing) {
+            return false;
+        }
+        LiveTuning.apply(blur, Arrays.asList(
+                "setStyle:i" + (dark ? VIVO_MATERIAL_DARK : VIVO_MATERIAL_LIGHT),
+                "setGlassEffect:f80,f22",
+                "setGlassEffectInnerStrokeLight:xFFFFFFFF,f1.0,f0.9333,f150,f150,i3,f1.0",
+                "setGlassEffectDispersion:f0.36",
+                "setGlassEffectDispersionSaturation:f1.0"));
+        return true;
     }
 
     /**
