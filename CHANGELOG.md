@@ -1,3 +1,9 @@
+## [1.5.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.4.4...v1.5.0-dev.1) (2026-10-13)
+
+### ✨ New Features
+
+* Use vivo's system glass material for the Glass Panel, as one sheet over keyboard and bottom bar ([9b93c07](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/9b93c07c5ab1014305d62643b76eca8de25f58c8))
+
 ## [1.4.4](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.4.3...v1.4.4) (2026-10-13)
 
 ### 🐛 Bug Fixes
