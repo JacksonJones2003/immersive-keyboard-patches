@@ -1,3 +1,9 @@
+## [1.4.3-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.4.2...v1.4.3-dev.1) (2026-10-13)
+
+### 🐛 Bug Fixes
+
+* Square all corners of the keyboard's blur, redraw when the top edge is found late, and log state ([aac3d17](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/aac3d1728bc3f274338f33308c86843d93db667c))
+
 ## [1.4.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.4.1...v1.4.2) (2026-10-09)
 
 ### 🐛 Bug Fixes
