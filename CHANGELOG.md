@@ -1,3 +1,9 @@
+## [1.7.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.6.1-dev.1...v1.7.0-dev.1) (2026-10-14)
+
+### ✨ New Features
+
+* Use the glass recipe from vivo's search screen, with matching dark and light variants ([edc9d4b](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/edc9d4baebe6240b0c321a76c6f36b38c5b89dd4))
+
 ## [1.6.1-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.6.0...v1.6.1-dev.1) (2026-10-14)
 
 ### 🐛 Bug Fixes
