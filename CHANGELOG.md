@@ -1,3 +1,9 @@
+## [1.6.1-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.6.0...v1.6.1-dev.1) (2026-10-14)
+
+### 🐛 Bug Fixes
+
+* Keep the glass shape applied when Frosted Glass rebuilds its blur ([69984a3](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/69984a3d1a5023887945f07789ef0ee2b6f07aac))
+
 ## [1.6.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.5.1...v1.6.0) (2026-10-14)
 
 ### ✨ New Features
