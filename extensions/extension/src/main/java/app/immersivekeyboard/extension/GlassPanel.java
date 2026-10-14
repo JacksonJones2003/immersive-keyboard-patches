@@ -6,8 +6,10 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
-import java.util.Arrays;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /**
  * Gives the translucent keyboard panel a glass look: light caught along its edges, a faint
@@ -39,14 +41,16 @@ public final class GlassPanel {
         return enabled;
     }
 
-    // vivo's widget materials, which are what make its compositor run the glass shader.
-    private static final int VIVO_MATERIAL_LIGHT = 201;
-    private static final int VIVO_MATERIAL_DARK = 251;
+    private static final String TAG = "ImmersiveKB";
+    // A material style of 0 tells vivo's compositor to use the custom material supplied below.
+    private static final int VIVO_STYLE_CUSTOM = 0;
+    private static final String VIVO_MATERIAL_CLASS = "android.view.blur.IVivoBlurRender$BlurGeometry";
 
     /**
      * Turns on the real glass material that vivo's OriginOS builds into its window blur:
-     * the compositor refracts what is behind the edges, adds rim light and a little color
-     * dispersion. The values are the ones vivo's own text magnifier uses. Returns false on
+     * the compositor refracts what is behind the edges and adds a rim light. The recipe is
+     * the one vivo's own search screen uses for its search box and suggestion card ("strong"
+     * glass, in its night and day variants), so the keyboard matches those. Returns false on
      * systems whose blur has no such options, where the drawn imitation is used instead.
      */
     static boolean applySystemGlass(Drawable blur, boolean dark) {
@@ -54,18 +58,53 @@ public final class GlassPanel {
             return false;
         }
         try {
-            blur.getClass().getDeclaredMethod("setGlassEffect", float.class, float.class);
-            blur.getClass().getDeclaredMethod("setStyle", int.class);
-        } catch (Throwable missing) {
+            Class<?> materialClass = Class.forName(VIVO_MATERIAL_CLASS);
+            Object material = materialClass.getDeclaredConstructor().newInstance();
+            // Tint layers: color, opacity and blend mode of up to three masks over the blur.
+            set(material, "mSaturation", dark ? 40f : 20f);
+            set(material, "mMaskColor_1", dark ? 0x000000 : 0xE6E6E6);
+            set(material, "mMaskOpacity_1", dark ? 0.35f : 0.1f);
+            set(material, "mMaskFusion_1", dark ? 2 : 0);
+            set(material, "mMaskColor_2", dark ? 0xBFBFBF : 0x262626);
+            set(material, "mMaskOpacity_2", dark ? 0.08f : 0.1f);
+            set(material, "mMaskFusion_2", dark ? 0 : 7);
+            set(material, "mMaskColor_3", 0xFFFFFF);
+            set(material, "mMaskOpacity_3", 0f);
+            set(material, "mMaskFusion_3", 0);
+            set(material, "mFinalOpacity", 1f);
+            set(material, "mFinalFusion", 0);
+            // Glass: how far the edge bends what is behind it, and the light along the rim.
+            set(material, "mNeedGlassEffect", true);
+            set(material, "mRefractionIntensity", 140f);
+            set(material, "mRefractionRange", 60f);
+            set(material, "mLightColor", 0xFFFFFF);
+            set(material, "mLight1Intensity", dark ? 0.45f : 0.5f);
+            set(material, "mLight1Rotation", 0.9f);
+            set(material, "mLight1LengthL", 1f);
+            set(material, "mLight1LengthR", 1f);
+            set(material, "mLight1StrokeWidth", 4f);
+            set(material, "mLight1Saturation", dark ? 0.4f : 0.5f);
+
+            Method setStyle = blur.getClass().getDeclaredMethod("setStyle", int.class);
+            setStyle.setAccessible(true);
+            setStyle.invoke(blur, VIVO_STYLE_CUSTOM);
+            Method setMaterial = blur.getClass()
+                    .getDeclaredMethod("setCustomMaterial", materialClass);
+            setMaterial.setAccessible(true);
+            setMaterial.invoke(blur, material);
+            return true;
+        } catch (ClassNotFoundException | NoSuchMethodException missing) {
+            return false;
+        } catch (Throwable failure) {
+            Log.w(TAG, "system glass unavailable: " + failure);
             return false;
         }
-        LiveTuning.apply(blur, Arrays.asList(
-                "setStyle:i" + (dark ? VIVO_MATERIAL_DARK : VIVO_MATERIAL_LIGHT),
-                "setGlassEffect:f80,f22",
-                "setGlassEffectInnerStrokeLight:xFFFFFFFF,f1.0,f0.9333,f150,f150,i3,f1.0",
-                "setGlassEffectDispersion:f0.36",
-                "setGlassEffectDispersionSaturation:f1.0"));
-        return true;
+    }
+
+    private static void set(Object target, String name, Object value) throws Exception {
+        Field field = target.getClass().getDeclaredField(name);
+        field.setAccessible(true);
+        field.set(target, value);
     }
 
     /**
