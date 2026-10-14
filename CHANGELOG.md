@@ -1,3 +1,9 @@
+## [1.6.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.5.1...v1.6.0-dev.1) (2026-10-14)
+
+### ✨ New Features
+
+* Round the glass sheet's top corners ([658f648](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/658f648416328b371553f8566c5b0ac35c5421e7))
+
 ## [1.5.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.5.0...v1.5.1) (2026-10-14)
 
 ### 🐛 Bug Fixes
