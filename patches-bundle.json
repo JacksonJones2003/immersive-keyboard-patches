@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-14T03:34:57",
-  "description": "## [1.7.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.7.0...v1.7.1) (2026-10-14)\n\n### 🐛 Bug Fixes\n\n* Light the whole glass border evenly and narrow the refraction band ([d62aac2](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/d62aac25c813b42ba68acff815a434d3c5443628))",
-  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.7.1/patches-1.7.1.mpp",
+  "created_at": "2026-10-14T03:46:01",
+  "description": "## [1.8.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.7.1...v1.8.0-dev.1) (2026-10-14)\n\n### ✨ New Features\n\n* Add Theme Follows Dark Mode patch ([3f7f050](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/3f7f050a2fcddf2c5b9908bde57e1cb214b09ce8))",
+  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.8.0-dev.1/patches-1.8.0-dev.1.mpp",
   "signature_download_url": "",
-  "version": "1.7.1"
+  "version": "1.8.0-dev.1"
 }

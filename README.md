@@ -18,9 +18,9 @@ Click here to add these patches to Morphe: https://morphe.software/add-source?gi
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.7.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/tag/v1.7.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;4 patches total
+> **[v1.8.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/tag/v1.8.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;5 patches total
 <details open>
-<summary>📦 Gboard&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
+<summary>📦 Gboard&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -33,6 +33,7 @@ Click here to add these patches to Morphe: https://morphe.software/add-source?gi
 | [Emoji Key On Right](#emoji-key-on-right) | Moves the dedicated emoji key from the left of the spacebar to just left of the enter / search key. |  |
 | [Glass Panel](#glass-panel) | Turns the translucent keyboard panel into glass. On vivo OriginOS it uses the system's own glass material, with real refraction, rim light and dispersion; elsewhere it draws lit edges and a sheen. Keys are left as they are. Works on top of Translucent Bottom Bar and Frosted Glass. |  |
 | [Immersive Keyboard](#immersive-keyboard) | Extends the keyboard under the camera cutout in landscape instead of leaving an empty strip beside it. |  |
+| [Theme Follows Dark Mode](#theme-follows-dark-mode) | Switches an imported custom theme between its light and dark versions (for example "Frosted Keys Light" and "Frosted Keys Dark") when the system dark mode changes. |  |
 | [Translucent Bottom Bar](#translucent-bottom-bar) | Makes the bar under the keyboard (behind the globe and close buttons) match the keyboard's color, opacity and blur, for use with transparent themes such as Frosted Glass. |  |
 
 </details>
