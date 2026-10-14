@@ -54,6 +54,8 @@ public final class BottomBarOpacity {
     private static final int FROSTED_GLASS_DEFAULT_OPACITY = 20;
     private static final int FROSTED_GLASS_DEFAULT_BLUR_STRENGTH = 20;
     private static final float FROSTED_GLASS_CORNER_RADIUS_DP = 32.0f;
+    /** Top corner radius of the glass sheet, close to the keyboard panel in iOS. */
+    private static final float GLASS_TOP_RADIUS_DP = 28.0f;
     private static final String ROUNDED_PANEL_ENABLED = "pref_rounded_keyboard_panel_enabled";
     private static final String ROUNDED_PANEL_MODE = "pref_rounded_keyboard_panel_mode";
     private static final String ROUNDED_PANEL_BOTTOM_RADIUS =
@@ -77,6 +79,7 @@ public final class BottomBarOpacity {
             state.drawnKeyboardTop = state.keyboardTop;
             state.drawnBlurSquared = state.blurSquared;
             state.drawnSystemGlass = state.systemGlass;
+            state.drawnGlassTopCorner = state.glassTopCorner;
             if (Color.alpha(keyboardColor) >= OPAQUE) {
                 return color;
             }
@@ -99,6 +102,7 @@ public final class BottomBarOpacity {
                 state.repaintBottomCorners(inputView, canvas);
                 state.repaintTopCorners(inputView, canvas);
                 state.drawGlassOnTop(inputView, canvas);
+                state.roundGlassTop(inputView, canvas);
             }
         } catch (Throwable ignored) {
             // Never block drawing.
@@ -244,6 +248,8 @@ public final class BottomBarOpacity {
         private int glassBottom = Integer.MIN_VALUE;
         private int glassNaturalBottom;
         private int glassCorner = -1;
+        private int glassTopCorner = -1;
+        private int drawnGlassTopCorner = -1;
         private boolean blurUnavailable;
 
         /**
@@ -303,6 +309,7 @@ public final class BottomBarOpacity {
                     glassDark = dark;
                     glassBottom = Integer.MIN_VALUE;
                     glassCorner = -1;
+                    glassTopCorner = -1;
                     if (systemGlass) {
                         refresh(keyboardBlur);
                         Log.i(TAG, "system glass on, dark=" + dark);
@@ -328,19 +335,62 @@ public final class BottomBarOpacity {
                 // the glass to match, so its rim follows the screen's curve instead of running
                 // off behind it.
                 int corner = screenCornerRadius(inputView);
-                if (corner != glassCorner) {
+                int topCorner = Math.round(glassTopRadiusDp()
+                        * inputView.getResources().getDisplayMetrics().density);
+                if (corner != glassCorner || topCorner != glassTopCorner) {
                     Method setCorners = keyboardBlur.getClass().getDeclaredMethod(
                             "setCornerRadius", float.class, float.class, float.class, float.class);
                     setCorners.setAccessible(true);
-                    setCorners.invoke(keyboardBlur, 0f, 0f, (float) corner, (float) corner);
+                    setCorners.invoke(keyboardBlur, (float) topCorner, (float) topCorner,
+                            (float) corner, (float) corner);
                     refresh(keyboardBlur);
                     glassCorner = corner;
-                    Log.i(TAG, "glass bottom corner radius=" + corner);
+                    glassTopCorner = topCorner;
+                    Log.i(TAG, "glass corner radius top=" + topCorner + " bottom=" + corner);
                 }
             } catch (Throwable failure) {
                 systemGlass = false;
                 Log.w(TAG, "system glass failed", failure);
             }
+        }
+
+        /**
+         * Radius, in dp, of the glass sheet's top corners. Can be overridden for tuning with
+         * {@code adb shell setprop debug.ikb.topradius 24}.
+         */
+        private static float glassTopRadiusDp() {
+            try {
+                String override = LiveTuning.property("debug.ikb.topradius");
+                if (!override.isEmpty()) {
+                    return Math.max(0f, Math.min(64f, Float.parseFloat(override)));
+                }
+            } catch (Throwable ignored) {
+                // Fall through to the default.
+            }
+            return GLASS_TOP_RADIUS_DP;
+        }
+
+        /**
+         * Gives the glass sheet rounded top corners. The blur is already rounded there, but
+         * the keyboard still paints its square base color and tint outside that curve, so
+         * erase those two wedges and let whatever is behind the keyboard show through.
+         */
+        void roundGlassTop(View inputView, Canvas canvas) {
+            if (!systemGlass || glassTopCorner <= 0 || keyboardTop == NO_TOP) {
+                return;
+            }
+            float radius = glassTopCorner;
+            float width = inputView.getWidth();
+            float top = topInInputView(inputView);
+            float bottom = top + radius;
+            cornerPath.rewind();
+            cornerPath.addRect(0, top, radius, bottom, Path.Direction.CW);
+            cornerPath.addRect(width - radius, top, width, bottom, Path.Direction.CW);
+            circlePath.rewind();
+            circlePath.addCircle(radius, bottom, radius, Path.Direction.CW);
+            circlePath.addCircle(width - radius, bottom, radius, Path.Direction.CW);
+            cornerPath.op(circlePath, Path.Op.DIFFERENCE);
+            canvas.drawPath(cornerPath, erasePaint);
         }
 
         /** Radius of the display's rounded bottom corners, or 0 when it has none. */
@@ -907,7 +957,8 @@ public final class BottomBarOpacity {
                 // known a moment after the keyboard first appears.
                 if (view != null && (keyboardColor(view, cachedFallback) != drawnColor
                         || keyboardTop != drawnKeyboardTop || blurSquared != drawnBlurSquared
-                        || systemGlass != drawnSystemGlass)) {
+                        || systemGlass != drawnSystemGlass
+                        || glassTopCorner != drawnGlassTopCorner)) {
                     view.invalidate();
                 }
             } catch (Throwable ignored) {
