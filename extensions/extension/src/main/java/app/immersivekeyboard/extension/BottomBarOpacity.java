@@ -249,6 +249,8 @@ public final class BottomBarOpacity {
         private int glassBottom = Integer.MIN_VALUE;
         private int glassNaturalBottom;
         private int glassCorner = -1;
+        /** Whether the last sample found any panel background at all. */
+        private boolean panelFound;
         /** The layered background that holds the keyboard's blur, when it is layered. */
         private LayerDrawable blurOwner;
         private int blurOwnerIndex;
@@ -273,8 +275,12 @@ public final class BottomBarOpacity {
             keyboardTop = findKeyboardTop(inputView);
             topColor = keyboardTop == NO_TOP ? 0 : sampleTop(inputView);
             int sampled = sampleKeyboard(inputView);
+            boolean transparentTheme = panelFound && Color.alpha(sampled) == 0;
             boolean frostedCustom = settings.customAlpha >= 0 && settings.customAlpha < OPAQUE;
-            if (Color.alpha(sampled) >= OPAQUE && frostedCustom) {
+            if (transparentTheme) {
+                // The theme paints nothing behind the keys, so the strip should not either.
+                cachedColor = Color.TRANSPARENT;
+            } else if (Color.alpha(sampled) >= OPAQUE && frostedCustom) {
                 // Frosted Glass is set to be see-through but the keyboard was read as solid:
                 // trust the setting for opacity and keep the keyboard's color.
                 cachedColor = withAlpha(sampled, settings.customAlpha);
@@ -307,7 +313,11 @@ public final class BottomBarOpacity {
                     systemGlass = false;
                     return;
                 }
-                boolean dark = luminance(cachedColor) < 0.5f;
+                // Follow the system's light or dark mode. Measuring the keyboard's color does
+                // not work for fully transparent themes, which have no color to measure.
+                boolean dark = (inputView.getResources().getConfiguration().uiMode
+                        & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                        == android.content.res.Configuration.UI_MODE_NIGHT_YES;
                 if (keyboardBlur != glassBlur.get() || dark != glassDark) {
                     systemGlass = GlassPanel.applySystemGlass(keyboardBlur, dark);
                     glassBlur = new WeakReference<>(keyboardBlur);
@@ -609,6 +619,7 @@ public final class BottomBarOpacity {
          */
         private int sampleAt(View inputView, float windowX, float windowY) {
             pixel.eraseColor(Color.TRANSPARENT);
+            panelFound = false;
             paintPanels(inputView, windowX, windowY, inputView.getWidth() * 0.8f);
             return pixel.getPixel(0, 0);
         }
@@ -633,6 +644,7 @@ public final class BottomBarOpacity {
                     Math.round(view.getAlpha() * OPAQUE));
             Drawable background = view.getBackground();
             if (background != null) {
+                panelFound = true;
                 int inner = pixelCanvas.save();
                 pixelCanvas.translate(left - windowX, top - windowY);
                 drawWithoutBlur(background, pixelCanvas);
