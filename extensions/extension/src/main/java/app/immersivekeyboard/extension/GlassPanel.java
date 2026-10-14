@@ -45,6 +45,8 @@ public final class GlassPanel {
     // A material style of 0 tells vivo's compositor to use the custom material supplied below.
     private static final int VIVO_STYLE_CUSTOM = 0;
     private static final String VIVO_MATERIAL_CLASS = "android.view.blur.IVivoBlurRender$BlurGeometry";
+    private static final float RIM_LIGHT_ROTATION = 0.9f;
+    private static final float RIM_LIGHT_LENGTH = 10f;
 
     /**
      * Turns on the real glass material that vivo's OriginOS builds into its window blur:
@@ -73,17 +75,26 @@ public final class GlassPanel {
             set(material, "mMaskFusion_3", 0);
             set(material, "mFinalOpacity", 1f);
             set(material, "mFinalFusion", 0);
-            // Glass: how far the edge bends what is behind it, and the light along the rim.
+            // Glass: how far the edge bends what is behind it. The search box's 60 px range
+            // is meant for a small pill; on a keyboard-sized sheet it makes the short bottom
+            // strip look almost unblurred, so keep the band narrow.
             set(material, "mNeedGlassEffect", true);
-            set(material, "mRefractionIntensity", 140f);
-            set(material, "mRefractionRange", 60f);
+            set(material, "mRefractionIntensity", 120f);
+            set(material, "mRefractionRange", 30f);
+            // Rim light. Each light only lights the border around its own angle, which on a
+            // wide sheet leaves parts of it dark; two opposite lights stretched along the whole
+            // border light it evenly. Tuned on a vivo X Fold.
             set(material, "mLightColor", 0xFFFFFF);
-            set(material, "mLight1Intensity", dark ? 0.45f : 0.5f);
-            set(material, "mLight1Rotation", 0.9f);
-            set(material, "mLight1LengthL", 1f);
-            set(material, "mLight1LengthR", 1f);
+            set(material, "mLight1Intensity", 1f);
+            set(material, "mLight1Rotation", RIM_LIGHT_ROTATION);
+            set(material, "mLight1LengthL", RIM_LIGHT_LENGTH);
+            set(material, "mLight1LengthR", RIM_LIGHT_LENGTH);
             set(material, "mLight1StrokeWidth", 4f);
             set(material, "mLight1Saturation", dark ? 0.4f : 0.5f);
+            set(material, "mLight2Intensity", 1f);
+            set(material, "mLight2Rotation", RIM_LIGHT_ROTATION + (float) Math.PI);
+            set(material, "mLight2Length", RIM_LIGHT_LENGTH);
+            set(material, "mLight2StrokeWidth", 4f);
 
             Method setStyle = blur.getClass().getDeclaredMethod("setStyle", int.class);
             setStyle.setAccessible(true);
