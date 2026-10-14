@@ -15,10 +15,12 @@ import android.os.Build;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
+import android.view.RoundedCorner;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.view.Window;
+import android.view.WindowInsets;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
@@ -241,6 +243,7 @@ public final class BottomBarOpacity {
         private boolean glassDark;
         private int glassBottom = Integer.MIN_VALUE;
         private int glassNaturalBottom;
+        private int glassCorner = -1;
         private boolean blurUnavailable;
 
         /**
@@ -299,6 +302,7 @@ public final class BottomBarOpacity {
                     glassBlur = new WeakReference<>(keyboardBlur);
                     glassDark = dark;
                     glassBottom = Integer.MIN_VALUE;
+                    glassCorner = -1;
                     if (systemGlass) {
                         refresh(keyboardBlur);
                         Log.i(TAG, "system glass on, dark=" + dark);
@@ -319,10 +323,40 @@ public final class BottomBarOpacity {
                     refresh(keyboardBlur);
                 }
                 glassBottom = wanted;
+
+                // The sheet ends at the bottom of the screen, whose corners are rounded. Round
+                // the glass to match, so its rim follows the screen's curve instead of running
+                // off behind it.
+                int corner = screenCornerRadius(inputView);
+                if (corner != glassCorner) {
+                    Method setCorners = keyboardBlur.getClass().getDeclaredMethod(
+                            "setCornerRadius", float.class, float.class, float.class, float.class);
+                    setCorners.setAccessible(true);
+                    setCorners.invoke(keyboardBlur, 0f, 0f, (float) corner, (float) corner);
+                    refresh(keyboardBlur);
+                    glassCorner = corner;
+                    Log.i(TAG, "glass bottom corner radius=" + corner);
+                }
             } catch (Throwable failure) {
                 systemGlass = false;
                 Log.w(TAG, "system glass failed", failure);
             }
+        }
+
+        /** Radius of the display's rounded bottom corners, or 0 when it has none. */
+        private static int screenCornerRadius(View view) {
+            if (Build.VERSION.SDK_INT < 31) {
+                return 0;
+            }
+            WindowInsets insets = view.getRootWindowInsets();
+            if (insets == null) {
+                return 0;
+            }
+            RoundedCorner left = insets.getRoundedCorner(RoundedCorner.POSITION_BOTTOM_LEFT);
+            RoundedCorner right = insets.getRoundedCorner(RoundedCorner.POSITION_BOTTOM_RIGHT);
+            int radius = Math.max(left == null ? 0 : left.getRadius(),
+                    right == null ? 0 : right.getRadius());
+            return Math.max(0, radius);
         }
 
         private static float luminance(int color) {
