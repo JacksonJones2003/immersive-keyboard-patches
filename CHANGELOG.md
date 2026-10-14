@@ -1,3 +1,9 @@
+## [1.8.1-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.8.0...v1.8.1-dev.1) (2026-10-14)
+
+### 🐛 Bug Fixes
+
+* Choose light or dark glass from the system mode and keep the bottom bar clear for transparent themes ([af63b66](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/af63b662caa676ab0f227041ea576fa5d0f37b46))
+
 ## [1.8.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.7.1...v1.8.0) (2026-10-14)
 
 ### ✨ New Features
