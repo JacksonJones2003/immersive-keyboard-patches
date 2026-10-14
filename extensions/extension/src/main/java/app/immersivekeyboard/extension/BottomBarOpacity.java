@@ -43,6 +43,7 @@ public final class BottomBarOpacity {
     private static final String TAG = "ImmersiveKB";
     private static final String DUMP_TAG = "ImmersiveKBDump";
     private static final long REFRESH_INTERVAL_MS = 150;
+    private static final long RECHECK_DELAY_MS = 220;
 
     // Settings written by the Frosted Glass patch from jasonwu1994/Gboard-patches.
     private static final String FROSTED_GLASS_PREFERENCES = "gboard_patches_settings";
@@ -248,6 +249,10 @@ public final class BottomBarOpacity {
         private int glassBottom = Integer.MIN_VALUE;
         private int glassNaturalBottom;
         private int glassCorner = -1;
+        /** The layered background that holds the keyboard's blur, when it is layered. */
+        private LayerDrawable blurOwner;
+        private int blurOwnerIndex;
+        private boolean recheckPosted;
         private int glassTopCorner = -1;
         private int drawnGlassTopCorner = -1;
         private boolean blurUnavailable;
@@ -318,18 +323,34 @@ public final class BottomBarOpacity {
                 if (!systemGlass) {
                     return;
                 }
-                // The blur is sized to the keyboard panel whenever that is laid out; add the
-                // strip's height back each time that happens.
-                android.graphics.Rect bounds = keyboardBlur.getBounds();
-                if (bounds.bottom != glassBottom) {
-                    glassNaturalBottom = bounds.bottom;
+                int padding = inputView.getPaddingBottom();
+                if (blurOwner != null && blurOwnerIndex < blurOwner.getNumberOfLayers()
+                        && blurOwner.getDrawable(blurOwnerIndex) == keyboardBlur) {
+                    // The panel's background re-sizes its layers every time it is laid out.
+                    // A negative bottom inset makes it keep the blur stretched over the strip
+                    // by itself, with no window in which the stretch is missing.
+                    if (blurOwner.getLayerInsetBottom(blurOwnerIndex) != -padding) {
+                        blurOwner.setLayerInsetBottom(blurOwnerIndex, -padding);
+                    }
+                    android.graphics.Rect owner = blurOwner.getBounds();
+                    android.graphics.Rect bounds = keyboardBlur.getBounds();
+                    if (!owner.isEmpty() && bounds.bottom != owner.bottom + padding) {
+                        keyboardBlur.setBounds(owner.left, owner.top, owner.right,
+                                owner.bottom + padding);
+                        refresh(keyboardBlur);
+                    }
+                } else {
+                    android.graphics.Rect bounds = keyboardBlur.getBounds();
+                    if (bounds.bottom != glassBottom) {
+                        glassNaturalBottom = bounds.bottom;
+                    }
+                    int wanted = glassNaturalBottom + padding;
+                    if (bounds.bottom != wanted) {
+                        keyboardBlur.setBounds(bounds.left, bounds.top, bounds.right, wanted);
+                        refresh(keyboardBlur);
+                    }
+                    glassBottom = wanted;
                 }
-                int wanted = glassNaturalBottom + inputView.getPaddingBottom();
-                if (bounds.bottom != wanted) {
-                    keyboardBlur.setBounds(bounds.left, bounds.top, bounds.right, wanted);
-                    refresh(keyboardBlur);
-                }
-                glassBottom = wanted;
 
                 // The sheet ends at the bottom of the screen, whose corners are rounded. Round
                 // the glass to match, so its rim follows the screen's curve instead of running
@@ -704,10 +725,13 @@ public final class BottomBarOpacity {
                 for (int index = 0; index < layers.getNumberOfLayers(); index++) {
                     Drawable layer = layers.getDrawable(index);
                     if (layer != null && layer != blur && isBlur(layer)) {
+                        blurOwner = layers;
+                        blurOwnerIndex = index;
                         return layer;
                     }
                 }
             } else if (background != null && background != blur && isBlur(background)) {
+                blurOwner = null;
                 return background;
             }
             if (view instanceof ViewGroup) {
@@ -961,10 +985,42 @@ public final class BottomBarOpacity {
                         || glassTopCorner != drawnGlassTopCorner)) {
                     view.invalidate();
                 }
+                if (view != null) {
+                    scheduleRecheck(view);
+                }
             } catch (Throwable ignored) {
                 // Never block drawing.
             }
             return true;
+        }
+
+        /**
+         * Looks at the keyboard once more shortly after the last frame. Frosted Glass rebuilds
+         * its blur a moment after the keyboard appears, often with no frame following, and
+         * without this the rebuilt blur would keep its default shape until something else
+         * happened to redraw the keyboard.
+         */
+        private void scheduleRecheck(View view) {
+            if (recheckPosted) {
+                return;
+            }
+            recheckPosted = true;
+            view.postDelayed(() -> {
+                recheckPosted = false;
+                try {
+                    lastRefresh = -REFRESH_INTERVAL_MS;
+                    Drawable before = glassBlur.get();
+                    int color = keyboardColor(view, cachedFallback);
+                    if (color != drawnColor || keyboardTop != drawnKeyboardTop
+                            || blurSquared != drawnBlurSquared || systemGlass != drawnSystemGlass
+                            || glassTopCorner != drawnGlassTopCorner
+                            || glassBlur.get() != before) {
+                        view.invalidate();
+                    }
+                } catch (Throwable ignored) {
+                    // Never disturb the keyboard.
+                }
+            }, RECHECK_DELAY_MS);
         }
 
         @Override
