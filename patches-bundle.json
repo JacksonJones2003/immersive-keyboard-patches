@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-14T02:47:46",
-  "description": "## [1.5.1-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.5.0...v1.5.1-dev.1) (2026-10-14)\n\n### 🐛 Bug Fixes\n\n* Round the glass sheet's bottom corners to the screen's corner radius ([c2ab41d](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/c2ab41d775abab45981c12ed01a2b3215b4eade1))",
-  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.5.1-dev.1/patches-1.5.1-dev.1.mpp",
+  "created_at": "2026-10-14T02:50:00",
+  "description": "## [1.5.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.5.0...v1.5.1) (2026-10-14)\n\n### 🐛 Bug Fixes\n\n* Round the glass sheet's bottom corners to the screen's corner radius ([c2ab41d](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/c2ab41d775abab45981c12ed01a2b3215b4eade1))",
+  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.5.1/patches-1.5.1.mpp",
   "signature_download_url": "",
-  "version": "1.5.1-dev.1"
+  "version": "1.5.1"
 }
