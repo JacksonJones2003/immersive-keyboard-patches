@@ -1,3 +1,9 @@
+## [1.7.1-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.7.0...v1.7.1-dev.1) (2026-10-14)
+
+### 🐛 Bug Fixes
+
+* Light the whole glass border evenly and narrow the refraction band ([d62aac2](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/d62aac25c813b42ba68acff815a434d3c5443628))
+
 ## [1.7.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.6.0...v1.7.0) (2026-10-14)
 
 ### 🐛 Bug Fixes
