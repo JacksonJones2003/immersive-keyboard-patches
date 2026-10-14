@@ -1,3 +1,9 @@
+## [1.8.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.7.1...v1.8.0) (2026-10-14)
+
+### ✨ New Features
+
+* Add Theme Follows Dark Mode patch ([3f7f050](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/3f7f050a2fcddf2c5b9908bde57e1cb214b09ce8))
+
 ## [1.8.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.7.1...v1.8.0-dev.1) (2026-10-14)
 
 ### ✨ New Features
