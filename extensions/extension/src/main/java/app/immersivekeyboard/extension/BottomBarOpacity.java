@@ -110,6 +110,7 @@ public final class BottomBarOpacity {
                 state.drawGlassOnTop(inputView, canvas);
                 state.roundGlassTop(inputView, canvas);
             }
+            OverlayPanels.watch(inputView);
         } catch (Throwable ignored) {
             // Never block drawing.
         }
