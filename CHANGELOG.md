@@ -1,3 +1,9 @@
+## [1.9.5](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.9.4...v1.9.5) (2026-10-21)
+
+### 🐛 Bug Fixes
+
+* Draw the keyboard's own backgrounds into the bottom bar so it is one piece with the keyboard ([0a15f78](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/0a15f788481fead8a7152f5d923fdc134bad27de))
+
 ## [1.9.5-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.9.4...v1.9.5-dev.1) (2026-10-21)
 
 ### 🐛 Bug Fixes
