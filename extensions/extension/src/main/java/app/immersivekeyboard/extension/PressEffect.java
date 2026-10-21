@@ -134,11 +134,31 @@ public final class PressEffect {
             animateScale(keyPanels(view), 1f, SPRING_MS, SPRING);
         }
 
-        /** The views that hold the keys, but not the glass behind them. */
+        /**
+         * The rows of keys inside each keyboard panel. The panels themselves carry the theme's
+         * tint, so scaling them would uncover a sliver of untinted glass along their edges;
+         * scaling only what is inside them leaves every background where it is.
+         */
         private List<View> keyPanels(View inputView) {
             List<View> panels = new ArrayList<>();
             collectKeyPanels(inputView, inputView.getWidth() * 0.8f, panels);
-            return panels;
+            List<View> contents = new ArrayList<>();
+            for (View panel : panels) {
+                if (!(panel instanceof ViewGroup)) {
+                    continue;
+                }
+                ViewGroup group = (ViewGroup) panel;
+                for (int index = 0; index < group.getChildCount(); index++) {
+                    View child = group.getChildAt(index);
+                    if (child.getVisibility() == View.VISIBLE) {
+                        // Pivot on the panel's bottom centre so the rows move as one piece.
+                        child.setPivotX(panel.getWidth() / 2f - child.getLeft());
+                        child.setPivotY(panel.getHeight() - child.getTop());
+                        contents.add(child);
+                    }
+                }
+            }
+            return contents;
         }
 
         private static void collectKeyPanels(View view, float minWidth, List<View> out) {
@@ -168,11 +188,7 @@ public final class PressEffect {
             }
             float[] start = new float[views.size()];
             for (int index = 0; index < views.size(); index++) {
-                View view = views.get(index);
-                // Dip toward the bottom of each panel.
-                view.setPivotX(view.getWidth() / 2f);
-                view.setPivotY(view.getHeight());
-                start[index] = view.getScaleX();
+                start[index] = views.get(index).getScaleX();
             }
             scale = ValueAnimator.ofFloat(0f, 1f);
             scale.setDuration(duration);
