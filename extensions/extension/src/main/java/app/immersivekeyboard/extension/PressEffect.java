@@ -22,7 +22,7 @@ import java.util.WeakHashMap;
  * Touch feedback in the style of vivo's liquid glass controls: a soft light blooms out from
  * the finger across the glass, and the keys around the finger dip into the glass and spring
  * back with a small wobble when it is released. The pressed key dips the most, its neighbours
- * less, and keys further away do not move at all. The glass sheet itself never moves: the system draws its
+ * less, and keys further away do not move at all. The toolbar row only lights up. The glass sheet itself never moves: the system draws its
  * blur separately and a frame behind, so moving the sheet made its corners glitch while typing.
  */
 @SuppressWarnings("unused")
@@ -204,9 +204,17 @@ public final class PressEffect {
             }
         }
 
-        /** Every key on screen; each Gboard key is its own SoftKeyView. */
+        /**
+         * Every key on screen, each Gboard key being its own SoftKeyView, except the toolbar
+         * row at the top, which stays still and only lights up.
+         */
         private static void collectKeys(View view, List<View> out) {
             if (view.getVisibility() != View.VISIBLE) {
+                return;
+            }
+            Object tag = view.getTag();
+            if (tag instanceof String
+                    && ((String) tag).contains(BottomBarOpacity.HEADER_AREA_TAG)) {
                 return;
             }
             if (view.getClass().getName().endsWith(KEY_VIEW_CLASS)) {

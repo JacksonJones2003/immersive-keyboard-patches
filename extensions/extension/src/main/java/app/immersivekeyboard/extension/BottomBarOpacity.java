@@ -37,7 +37,7 @@ import java.util.WeakHashMap;
 public final class BottomBarOpacity {
     private static final String BASE_AREA_TAG = ".keyboard-base-area";
     private static final String BODY_AREA_TAG = ".keyboard-body-area";
-    private static final String HEADER_AREA_TAG = ".keyboard-header-area";
+    static final String HEADER_AREA_TAG = ".keyboard-header-area";
     private static final int NO_TOP = Integer.MAX_VALUE;
     private static final int OPAQUE = 255;
     private static final String TAG = "ImmersiveKB";
