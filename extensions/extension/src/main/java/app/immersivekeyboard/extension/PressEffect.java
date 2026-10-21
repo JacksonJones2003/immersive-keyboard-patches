@@ -21,7 +21,7 @@ import java.util.WeakHashMap;
 /**
  * Touch feedback in the style of vivo's liquid glass controls: a soft light blooms out from
  * the finger across the glass, and the keys around the finger dip into the glass and spring
- * back with a small wobble when it is released. The pressed key dips the most, its neighbours
+ * back with a small wobble when it is released; when gliding, the dip follows the finger. The pressed key dips the most, its neighbours
  * less, and keys further away do not move at all. The toolbar row only lights up. The glass sheet itself never moves: the system draws its
  * blur separately and a frame behind, so moving the sheet made its corners glitch while typing.
  */
@@ -37,6 +37,9 @@ public final class PressEffect {
     private static final float REACH_KEYS = 1.6f;
     private static final long PRESS_MS = 90;
     private static final long SPRING_MS = 420;
+    /** While gliding, how far the finger moves before the dip follows, in reaches. */
+    private static final float GLIDE_STEP = 0.15f;
+    private static final long GLIDE_MS = 60;
 
     private static final String KEY_VIEW_CLASS = "SoftKeyView";
 
@@ -60,6 +63,10 @@ public final class PressEffect {
                 float y = event.getY(index);
                 state.flash(inputView, x, y);
                 state.press(inputView, event.getPointerId(index), x, y);
+            } else if (action == MotionEvent.ACTION_MOVE) {
+                for (int index = 0; index < event.getPointerCount(); index++) {
+                    state.move(event.getPointerId(index), event.getX(index), event.getY(index));
+                }
             } else if (action == MotionEvent.ACTION_POINTER_UP) {
                 state.release(event.getPointerId(event.getActionIndex()));
             } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
@@ -91,8 +98,8 @@ public final class PressEffect {
         private float flashX;
         private float flashY;
         private long flashStart = -1;
-        /** The keys each finger is holding down. */
-        private final Map<Integer, List<View>> pressed = new HashMap<>();
+        /** What each finger on the keyboard is pressing. */
+        private final Map<Integer, Touch> pressed = new HashMap<>();
 
         void flash(View view, float x, float y) {
             flashX = x;
@@ -164,38 +171,64 @@ public final class PressEffect {
                     keyWidth = Math.min(key.getWidth(), key.getHeight() * 1.5f);
                 }
             }
-            float reach = Math.max(1f, keyWidth * REACH_KEYS);
+            Touch touch = new Touch(keys, bounds, Math.max(1f, keyWidth * REACH_KEYS));
+            pressed.put(pointer, touch);
+            dip(touch, x, y, PRESS_MS);
+        }
+
+        /** Follows a finger gliding across the keys, as in glide typing. */
+        void move(int pointer, float x, float y) {
+            Touch touch = pressed.get(pointer);
+            if (touch != null && Math.hypot(x - touch.x, y - touch.y)
+                    >= touch.reach * GLIDE_STEP) {
+                dip(touch, x, y, GLIDE_MS);
+            }
+        }
+
+        /** Dips the keys around (x, y) and lets the ones the finger has left spring back. */
+        private void dip(Touch touch, float x, float y, long duration) {
+            touch.x = x;
+            touch.y = y;
             List<View> held = new ArrayList<>();
-            for (int index = 0; index < keys.size(); index++) {
-                float[] key = bounds[index];
+            for (int index = 0; index < touch.keys.size(); index++) {
+                float[] key = touch.bounds[index];
                 float distance = (float) Math.hypot(key[2] - x, key[3] - y);
-                if (distance >= reach) {
+                if (distance >= touch.reach) {
                     continue;
                 }
-                float falloff = 0.5f + 0.5f * (float) Math.cos(Math.PI * distance / reach);
-                View view = keys.get(index);
+                float falloff = 0.5f + 0.5f * (float) Math.cos(Math.PI * distance / touch.reach);
+                View view = touch.keys.get(index);
                 // Pivot on the finger, so the keys around it lean slightly in toward it.
                 view.setPivotX(x - key[0]);
                 view.setPivotY(y - key[1]);
                 float target = 1f - PRESS_DEPTH * falloff;
                 view.animate().cancel();
                 view.animate().scaleX(target).scaleY(target)
-                        .setDuration(PRESS_MS).setInterpolator(null).start();
+                        .setDuration(duration).setInterpolator(null).start();
                 held.add(view);
             }
-            pressed.put(pointer, held);
+            for (View view : touch.held) {
+                if (!held.contains(view)) {
+                    springBack(view);
+                }
+            }
+            touch.held = held;
         }
 
         void release(int pointer) {
-            List<View> keys = pressed.remove(pointer);
-            if (keys == null) {
+            Touch touch = pressed.remove(pointer);
+            if (touch == null) {
                 return;
             }
-            for (View key : keys) {
-                key.animate().cancel();
-                key.animate().scaleX(1f).scaleY(1f)
-                        .setDuration(SPRING_MS).setInterpolator(SPRING).start();
+            for (View key : touch.held) {
+                springBack(key);
             }
+        }
+
+        private static void springBack(View key) {
+            key.animate().cancel();
+            key.animate().scaleX(1f).scaleY(1f)
+                    .setDuration(SPRING_MS).setInterpolator(SPRING).start();
         }
 
         void releaseAll() {
@@ -229,6 +262,23 @@ public final class PressEffect {
                     collectKeys(group.getChildAt(index), out);
                 }
             }
+        }
+    }
+
+    /** One finger on the keyboard: the keys it can reach and the ones it is dipping. */
+    private static final class Touch {
+        final List<View> keys;
+        /** Left, top, centre x and centre y of each key, relative to the InputView. */
+        final float[][] bounds;
+        final float reach;
+        List<View> held = new ArrayList<>();
+        float x;
+        float y;
+
+        Touch(List<View> keys, float[][] bounds, float reach) {
+            this.keys = keys;
+            this.bounds = bounds;
+            this.reach = reach;
         }
     }
 
