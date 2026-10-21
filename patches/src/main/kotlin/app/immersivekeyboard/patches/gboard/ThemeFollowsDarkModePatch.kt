@@ -9,9 +9,9 @@ private const val EXTENSION_CLASS = "Lapp/immersivekeyboard/extension/ThemeDarkM
 @Suppress("unused")
 val themeFollowsDarkModePatch = bytecodePatch(
     name = "Theme Follows Dark Mode",
-    description = "Switches an imported custom theme between its light and dark versions " +
-        "(for example \"Frosted Keys Light\" and \"Frosted Keys Dark\") when the system " +
-        "dark mode changes.",
+    description = "Gives the keyboard a light theme and a dark theme. Pick a theme while the " +
+        "phone is in light mode and another while it is in dark mode, and the keyboard " +
+        "switches between them when the system dark mode changes.",
     default = true
 ) {
     compatibleWith(COMPATIBILITY_GBOARD)
