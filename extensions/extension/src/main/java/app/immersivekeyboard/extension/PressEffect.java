@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import android.os.SystemClock;
@@ -25,9 +26,9 @@ public final class PressEffect {
     private static final long FLASH_FADE_MS = 380;
     private static final int FLASH_PEAK_ALPHA = 56;
     private static final float FLASH_RADIUS_FRACTION = 0.55f;
-    private static final float PRESSED_SCALE = 0.988f;
+    private static final float PRESSED_SCALE = 0.995f;
     private static final long PRESS_MS = 90;
-    private static final long SPRING_MS = 520;
+    private static final long SPRING_MS = 420;
 
     private static final Map<View, State> STATES = new WeakHashMap<>();
 
@@ -72,6 +73,7 @@ public final class PressEffect {
 
     private static final class State {
         private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Path sheet = new Path();
         private float flashX;
         private float flashY;
         private long flashStart = -1;
@@ -107,7 +109,13 @@ public final class PressEffect {
                     new int[]{Color.argb(alpha, 255, 255, 255),
                             Color.argb(alpha / 3, 255, 255, 255), Color.TRANSPARENT},
                     new float[]{0f, 0.45f, 1f}, Shader.TileMode.CLAMP));
+            // Only light the glass itself, never the cleared corners or the space above it.
+            int save = canvas.save();
+            if (BottomBarOpacity.glassSheet(view, sheet)) {
+                canvas.clipPath(sheet);
+            }
             canvas.drawRect(0, 0, view.getWidth(), view.getHeight(), paint);
+            canvas.restoreToCount(save);
             paint.setShader(null);
             view.postInvalidateOnAnimation();
         }
@@ -146,5 +154,5 @@ public final class PressEffect {
 
     /** A lightly damped spring: overshoots once or twice, then settles. */
     private static final Interpolator SPRING = t ->
-            (float) (1 - Math.exp(-6.5 * t) * Math.cos(15 * t));
+            (float) (1 - Math.exp(-8.5 * t) * Math.cos(13 * t));
 }

@@ -127,6 +127,27 @@ public final class BottomBarOpacity {
         }
     }
 
+    /**
+     * The outline of the keyboard's glass sheet, from the top of the keyboard to the bottom of
+     * the screen with its rounded corners, in InputView coordinates. False while it is not
+     * known yet.
+     */
+    static boolean glassSheet(View inputView, Path out) {
+        State state = STATES.get(inputView);
+        if (state == null || state.keyboardTop == NO_TOP) {
+            return false;
+        }
+        float top = state.topInInputView(inputView);
+        float topRadius = state.systemGlass && state.glassTopCorner > 0 ? state.glassTopCorner : 0;
+        float bottomRadius = state.systemGlass && state.glassCorner > 0 ? state.glassCorner : 0;
+        out.rewind();
+        out.addRoundRect(0, top, inputView.getWidth(), inputView.getHeight(),
+                new float[]{topRadius, topRadius, topRadius, topRadius,
+                        bottomRadius, bottomRadius, bottomRadius, bottomRadius},
+                Path.Direction.CW);
+        return true;
+    }
+
     private static int withAlpha(int color, int alpha) {
         return (color & 0x00FFFFFF) | (alpha << 24);
     }
