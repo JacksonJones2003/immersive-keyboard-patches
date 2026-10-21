@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-21T02:02:07",
-  "description": "## [1.9.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.8.1...v1.9.0-dev.1) (2026-10-21)\n\n### ✨ New Features\n\n* Add Glass Press Effect patch ([7cf3c10](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/7cf3c100a8800dd9c5feabdfc815cf2496807718))",
-  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.9.0-dev.1/patches-1.9.0-dev.1.mpp",
+  "created_at": "2026-10-21T02:04:18",
+  "description": "## [1.9.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.8.1...v1.9.0) (2026-10-21)\n\n### ✨ New Features\n\n* Add Glass Press Effect patch ([7cf3c10](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/7cf3c100a8800dd9c5feabdfc815cf2496807718))",
+  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.9.0/patches-1.9.0.mpp",
   "signature_download_url": "",
-  "version": "1.9.0-dev.1"
+  "version": "1.9.0"
 }

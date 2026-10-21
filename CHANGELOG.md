@@ -1,3 +1,9 @@
+## [1.9.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.8.1...v1.9.0) (2026-10-21)
+
+### ✨ New Features
+
+* Add Glass Press Effect patch ([7cf3c10](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/7cf3c100a8800dd9c5feabdfc815cf2496807718))
+
 ## [1.9.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.8.1...v1.9.0-dev.1) (2026-10-21)
 
 ### ✨ New Features
