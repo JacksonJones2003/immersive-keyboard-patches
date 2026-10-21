@@ -86,6 +86,11 @@ public final class BottomBarOpacity {
             }
             state.drawBlur(inputView, canvas);
             state.drawGlassBehind(inputView, canvas);
+            if (state.drawPanelsIntoStrip(inputView, canvas)) {
+                // The strip now shows the keyboard's own backgrounds; Gboard's plain fill
+                // would only cover them.
+                return Color.TRANSPARENT;
+            }
             return keyboardColor;
         } catch (Throwable ignored) {
             return color;
@@ -631,6 +636,82 @@ public final class BottomBarOpacity {
             } catch (Throwable ignored) {
                 return 0;
             }
+        }
+
+        /**
+         * Continues the keyboard down over the strip by drawing the keyboard's own panel
+         * backgrounds there: the same drawables, alpha and order, aligned so their bottom rows
+         * fill the strip. Keyboard and strip then always share one shade, with nothing measured.
+         * Returns false when there is nothing to draw.
+         */
+        boolean drawPanelsIntoStrip(View inputView, Canvas canvas) {
+            int padding = inputView.getPaddingBottom();
+            if (padding <= 0) {
+                return false;
+            }
+            inputView.getLocationInWindow(origin);
+            int originX = origin[0];
+            int originY = origin[1];
+            float density = inputView.getResources().getDisplayMetrics().density;
+            float stripTop = inputView.getHeight() - padding;
+            List<View> panels = new ArrayList<>();
+            collectPanels(inputView, originX + inputView.getWidth() / 2f,
+                    originY + stripTop - 2f * density, inputView.getWidth() * 0.8f, panels);
+            if (panels.isEmpty()) {
+                return false;
+            }
+            int save = canvas.save();
+            canvas.clipRect(0, stripTop, inputView.getWidth(), inputView.getHeight());
+            for (View panel : panels) {
+                panel.getLocationInWindow(location);
+                float left = location[0] - originX;
+                // Line the panel's bottom edge up with the bottom of the strip.
+                float top = inputView.getHeight() - panel.getHeight();
+                float alpha = effectiveAlpha(panel, inputView);
+                int layer = alpha < 1f
+                        ? canvas.saveLayerAlpha(0, stripTop, inputView.getWidth(),
+                                inputView.getHeight(), Math.round(alpha * OPAQUE))
+                        : canvas.save();
+                canvas.translate(left, top);
+                drawWithoutBlur(panel.getBackground(), canvas);
+                canvas.restoreToCount(layer);
+            }
+            canvas.restoreToCount(save);
+            return true;
+        }
+
+        /** Panels with a background that cover the point, outermost first. */
+        private void collectPanels(View view, float windowX, float windowY, float minWidth,
+                List<View> out) {
+            if (view.getVisibility() != View.VISIBLE || view.getWidth() < minWidth
+                    || view.getAlpha() <= 0f) {
+                return;
+            }
+            view.getLocationInWindow(location);
+            if (windowX < location[0] || windowX >= location[0] + view.getWidth()
+                    || windowY < location[1] || windowY >= location[1] + view.getHeight()) {
+                return;
+            }
+            if (view.getBackground() != null) {
+                out.add(view);
+            }
+            if (view instanceof ViewGroup) {
+                ViewGroup group = (ViewGroup) view;
+                for (int index = 0; index < group.getChildCount(); index++) {
+                    collectPanels(group.getChildAt(index), windowX, windowY, minWidth, out);
+                }
+            }
+        }
+
+        /** Alpha of a view as drawn, including that of its parents up to InputView. */
+        private static float effectiveAlpha(View view, View inputView) {
+            float alpha = 1f;
+            for (View current = view; current != null && current != inputView; ) {
+                alpha *= current.getAlpha();
+                ViewParent parent = current.getParent();
+                current = parent instanceof View ? (View) parent : null;
+            }
+            return alpha;
         }
 
         /**
