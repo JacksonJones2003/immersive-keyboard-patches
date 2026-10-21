@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-21T02:26:40",
-  "description": "## [1.9.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.9.1...v1.9.2) (2026-10-21)\n\n### 🐛 Bug Fixes\n\n* Keep the press glow inside the glass sheet and make the bounce subtler ([a359060](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/a359060d4c0fc7c8d354e08ec98abf7fa353e41a))",
-  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.9.2/patches-1.9.2.mpp",
+  "created_at": "2026-10-21T02:36:23",
+  "description": "## [1.9.3-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.9.2...v1.9.3-dev.1) (2026-10-21)\n\n### 🐛 Bug Fixes\n\n* Bounce only the keys so the glass sheet's corners stay put while typing ([21345df](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/21345df0c07af62131d12d3e53a608ebfb82d513))",
+  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.9.3-dev.1/patches-1.9.3-dev.1.mpp",
   "signature_download_url": "",
-  "version": "1.9.2"
+  "version": "1.9.3-dev.1"
 }

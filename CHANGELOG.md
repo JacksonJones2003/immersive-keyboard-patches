@@ -1,3 +1,9 @@
+## [1.9.3-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.9.2...v1.9.3-dev.1) (2026-10-21)
+
+### 🐛 Bug Fixes
+
+* Bounce only the keys so the glass sheet's corners stay put while typing ([21345df](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/21345df0c07af62131d12d3e53a608ebfb82d513))
+
 ## [1.9.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.9.1...v1.9.2) (2026-10-21)
 
 ### 🐛 Bug Fixes
