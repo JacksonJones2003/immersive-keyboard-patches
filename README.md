@@ -18,7 +18,7 @@ Click here to add these patches to Morphe: https://morphe.software/add-source?gi
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.9.5](https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/tag/v1.9.5)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;6 patches total
+> **[v1.10.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/tag/v1.10.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;6 patches total
 <details open>
 <summary>📦 Gboard&nbsp;&nbsp;•&nbsp;&nbsp;6 patches</summary>
 <br>
@@ -34,7 +34,7 @@ Click here to add these patches to Morphe: https://morphe.software/add-source?gi
 | [Glass Panel](#glass-panel) | Turns the translucent keyboard panel into glass. On vivo OriginOS it uses the system's own glass material, with real refraction, rim light and dispersion; elsewhere it draws lit edges and a sheen. Keys are left as they are. Works on top of Translucent Bottom Bar and Frosted Glass. |  |
 | [Glass Press Effect](#glass-press-effect) | Adds vivo-style liquid glass touch feedback: a soft light blooms out from your finger across the keyboard background, and the keys dip slightly and springs back with a small wobble. |  |
 | [Immersive Keyboard](#immersive-keyboard) | Extends the keyboard under the camera cutout in landscape instead of leaving an empty strip beside it. |  |
-| [Theme Follows Dark Mode](#theme-follows-dark-mode) | Switches an imported custom theme between its light and dark versions (for example "Frosted Keys Light" and "Frosted Keys Dark") when the system dark mode changes. |  |
+| [Theme Follows Dark Mode](#theme-follows-dark-mode) | Gives the keyboard a light theme and a dark theme. Pick a theme while the phone is in light mode and another while it is in dark mode, and the keyboard switches between them when the system dark mode changes. |  |
 | [Translucent Bottom Bar](#translucent-bottom-bar) | Makes the bar under the keyboard (behind the globe and close buttons) match the keyboard's color, opacity and blur, for use with transparent themes such as Frosted Glass. |  |
 
 </details>

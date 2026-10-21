@@ -1,3 +1,9 @@
+## [1.10.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.9.5...v1.10.0-dev.1) (2026-10-21)
+
+### ✨ New Features
+
+* Remember a light theme and a dark theme picked by the user and switch between them ([6d5ee03](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/6d5ee03584e56c39bd72bc063c7775398fb55bb6))
+
 ## [1.9.5](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.9.4...v1.9.5) (2026-10-21)
 
 ### 🐛 Bug Fixes
