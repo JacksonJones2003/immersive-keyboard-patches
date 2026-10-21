@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-21T18:25:46",
-  "description": "## [1.12.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.12.0...v1.12.1) (2026-10-21)\n\n### 🐛 Bug Fixes\n\n* Give panels opened over the keyboard the same translucent tint as the toolbar ([c0fa419](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/c0fa4199d6ff9803378e144c830d91e296a63743))",
-  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.12.1/patches-1.12.1.mpp",
+  "created_at": "2026-10-21T18:32:55",
+  "description": "## [1.13.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.12.1...v1.13.0-dev.1) (2026-10-21)\n\n### ✨ New Features\n\n* Make the key dip follow the finger while glide typing ([f08b458](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/f08b458c5db40d2ef16e46cf118539b503e2e28f))",
+  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.13.0-dev.1/patches-1.13.0-dev.1.mpp",
   "signature_download_url": "",
-  "version": "1.12.1"
+  "version": "1.13.0-dev.1"
 }

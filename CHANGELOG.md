@@ -1,3 +1,9 @@
+## [1.13.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.12.1...v1.13.0-dev.1) (2026-10-21)
+
+### ✨ New Features
+
+* Make the key dip follow the finger while glide typing ([f08b458](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/f08b458c5db40d2ef16e46cf118539b503e2e28f))
+
 ## [1.12.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.12.0...v1.12.1) (2026-10-21)
 
 ### 🐛 Bug Fixes
