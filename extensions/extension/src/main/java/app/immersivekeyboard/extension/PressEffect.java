@@ -10,15 +10,19 @@ import android.graphics.Shader;
 import android.os.SystemClock;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
  * Touch feedback in the style of vivo's liquid glass controls: a soft light blooms out from
- * the finger across the glass behind the keys, and the keyboard dips slightly under the finger
- * and springs back with a small wobble when it is released.
+ * the finger across the glass, and the keys dip slightly under the finger and spring back with
+ * a small wobble when it is released. The glass sheet itself never moves: the system draws its
+ * blur separately and a frame behind, so moving the sheet made its corners glitch while typing.
  */
 @SuppressWarnings("unused")
 public final class PressEffect {
@@ -26,9 +30,11 @@ public final class PressEffect {
     private static final long FLASH_FADE_MS = 380;
     private static final int FLASH_PEAK_ALPHA = 56;
     private static final float FLASH_RADIUS_FRACTION = 0.55f;
-    private static final float PRESSED_SCALE = 0.995f;
+    private static final float PRESSED_SCALE = 0.992f;
     private static final long PRESS_MS = 90;
     private static final long SPRING_MS = 420;
+
+    private static final String KEYBOARD_VIEW_CLASS = "SoftKeyboardView";
 
     private static final Map<View, State> STATES = new WeakHashMap<>();
 
@@ -121,22 +127,53 @@ public final class PressEffect {
         }
 
         void press(View view) {
-            animateScale(view, PRESSED_SCALE, PRESS_MS, null);
+            animateScale(keyPanels(view), PRESSED_SCALE, PRESS_MS, null);
         }
 
         void release(View view) {
-            animateScale(view, 1f, SPRING_MS, SPRING);
+            animateScale(keyPanels(view), 1f, SPRING_MS, SPRING);
         }
 
-        private void animateScale(View view, float target, long duration,
+        /** The views that hold the keys, but not the glass behind them. */
+        private List<View> keyPanels(View inputView) {
+            List<View> panels = new ArrayList<>();
+            collectKeyPanels(inputView, inputView.getWidth() * 0.8f, panels);
+            return panels;
+        }
+
+        private static void collectKeyPanels(View view, float minWidth, List<View> out) {
+            if (view.getVisibility() != View.VISIBLE) {
+                return;
+            }
+            if (view.getClass().getName().endsWith(KEYBOARD_VIEW_CLASS)
+                    && view.getWidth() >= minWidth) {
+                out.add(view);
+                return;
+            }
+            if (view instanceof ViewGroup) {
+                ViewGroup group = (ViewGroup) view;
+                for (int index = 0; index < group.getChildCount(); index++) {
+                    collectKeyPanels(group.getChildAt(index), minWidth, out);
+                }
+            }
+        }
+
+        private void animateScale(List<View> views, float target, long duration,
                 Interpolator interpolator) {
             if (scale != null) {
                 scale.cancel();
             }
-            // Dip toward the bottom edge, so the keyboard stays anchored to the screen.
-            view.setPivotX(view.getWidth() / 2f);
-            view.setPivotY(view.getHeight());
-            float start = view.getScaleX();
+            if (views.isEmpty()) {
+                return;
+            }
+            float[] start = new float[views.size()];
+            for (int index = 0; index < views.size(); index++) {
+                View view = views.get(index);
+                // Dip toward the bottom of each panel.
+                view.setPivotX(view.getWidth() / 2f);
+                view.setPivotY(view.getHeight());
+                start[index] = view.getScaleX();
+            }
             scale = ValueAnimator.ofFloat(0f, 1f);
             scale.setDuration(duration);
             if (interpolator != null) {
@@ -144,9 +181,11 @@ public final class PressEffect {
             }
             scale.addUpdateListener(animation -> {
                 float progress = (float) animation.getAnimatedValue();
-                float value = start + (target - start) * progress;
-                view.setScaleX(value);
-                view.setScaleY(value);
+                for (int index = 0; index < views.size(); index++) {
+                    float value = start[index] + (target - start[index]) * progress;
+                    views.get(index).setScaleX(value);
+                    views.get(index).setScaleY(value);
+                }
             });
             scale.start();
         }
