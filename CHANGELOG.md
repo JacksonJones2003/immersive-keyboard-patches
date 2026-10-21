@@ -1,3 +1,9 @@
+## [1.11.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.10.0...v1.11.0-dev.1) (2026-10-21)
+
+### ✨ New Features
+
+* Bounce only the keys around the finger instead of the whole keyboard ([8f6eef3](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/8f6eef36df7957ea25f68446ff49b475637b6ef2))
+
 ## [1.10.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.9.5...v1.10.0) (2026-10-21)
 
 ### ✨ New Features
