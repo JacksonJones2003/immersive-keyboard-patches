@@ -1,3 +1,9 @@
+## [1.9.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.9.1...v1.9.2) (2026-10-21)
+
+### 🐛 Bug Fixes
+
+* Keep the press glow inside the glass sheet and make the bounce subtler ([a359060](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/a359060d4c0fc7c8d354e08ec98abf7fa353e41a))
+
 ## [1.9.2-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.9.1...v1.9.2-dev.1) (2026-10-21)
 
 ### 🐛 Bug Fixes
