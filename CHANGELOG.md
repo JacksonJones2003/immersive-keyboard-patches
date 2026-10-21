@@ -1,3 +1,9 @@
+## [1.12.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.12.0...v1.12.1) (2026-10-21)
+
+### 🐛 Bug Fixes
+
+* Give panels opened over the keyboard the same translucent tint as the toolbar ([c0fa419](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/c0fa4199d6ff9803378e144c830d91e296a63743))
+
 ## [1.12.1-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.12.0...v1.12.1-dev.1) (2026-10-21)
 
 ### 🐛 Bug Fixes
