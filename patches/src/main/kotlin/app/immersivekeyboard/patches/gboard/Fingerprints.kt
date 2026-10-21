@@ -101,3 +101,17 @@ object InputViewDispatchTouchFingerprint : Fingerprint(
     returnType = "Z",
     parameters = listOf("Landroid/view/MotionEvent;")
 )
+
+/**
+ * ThemeListingFragment.onCreateView, which inflates the Themes screen: a FrameLayout with the
+ * theme list as its first child.
+ */
+object ThemeListingCreateViewFingerprint : Fingerprint(
+    definingClass = "Lcom/google/android/apps/inputmethod/libs/theme/listing/ThemeListingFragment;",
+    returnType = "Landroid/view/View;",
+    parameters = listOf(
+        "Landroid/view/LayoutInflater;",
+        "Landroid/view/ViewGroup;",
+        "Landroid/os/Bundle;"
+    )
+)

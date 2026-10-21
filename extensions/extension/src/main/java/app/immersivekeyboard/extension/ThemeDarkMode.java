@@ -19,23 +19,23 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * Gives the keyboard a light theme and a dark theme that follow the system's dark mode.
- * Whatever theme you pick while the phone is in light mode becomes the light theme, and
- * whatever you pick in dark mode becomes the dark theme; when the system switches, the other
- * one is selected. Any theme works, built-in or imported. Until a mode has a pick of its own,
- * an imported theme with the same name and the opposite variant is used if there is one
- * ("Glass Keys Light" and "Glass Keys Dark").
+ * Gives the keyboard a light theme and a dark theme that follow the system's dark mode. The
+ * pair is chosen in the "Light & dark pair" card that {@link ThemePairMenu} adds to Gboard's
+ * Themes screen; picking a theme in Gboard's own list also sets the current mode's half.
+ * Until a mode has a theme of its own, an imported theme with the same name and the opposite
+ * variant is used if there is one ("Glass Keys Light" and "Glass Keys Dark").
  */
 @SuppressWarnings("unused")
 public final class ThemeDarkMode {
     private static final String TAG = "ImmersiveKB";
-    private static final String THEME_PREFERENCE = "additional_keyboard_theme";
-    private static final String FILE_THEME_PREFIX = "files:";
-    private static final String USER_THEME_PREFIX = "user_theme_";
+    static final String THEME_PREFERENCE = "additional_keyboard_theme";
+    static final String FILE_THEME_PREFIX = "files:";
+    static final String USER_THEME_PREFIX = "user_theme_";
     private static final String KEY_BORDER_PREFERENCE = "enable_key_border";
     private static final String MEMORY = "immersive_keyboard_themes";
+    private static final String ENABLED = "pair_enabled";
     private static final String LAST_MODE = "last_mode";
-    private static final String THEME_SUFFIX = "_theme";
+    static final String THEME_SUFFIX = "_theme";
     private static final String BORDER_SUFFIX = "_key_border";
     private static final long CHECK_INTERVAL_MS = 1500;
 
@@ -58,18 +58,62 @@ public final class ThemeDarkMode {
             }
             lastNightMode = nightMode;
             lastCheck = now;
-            boolean wantLight = nightMode != Configuration.UI_MODE_NIGHT_YES;
-            apply(context, wantLight);
+            apply(context, nightMode != Configuration.UI_MODE_NIGHT_YES, false);
         } catch (Throwable failure) {
             Log.w(TAG, "theme dark mode check failed", failure);
         }
     }
 
-    private static void apply(Context context, boolean wantLight) {
-        Context storage = context.createDeviceProtectedStorageContext();
-        SharedPreferences gboard = storage.getSharedPreferences(
+    static SharedPreferences gboardPreferences(Context context) {
+        return context.createDeviceProtectedStorageContext().getSharedPreferences(
                 context.getPackageName() + "_preferences", Context.MODE_PRIVATE);
-        SharedPreferences memory = storage.getSharedPreferences(MEMORY, Context.MODE_PRIVATE);
+    }
+
+    static SharedPreferences memory(Context context) {
+        return context.createDeviceProtectedStorageContext()
+                .getSharedPreferences(MEMORY, Context.MODE_PRIVATE);
+    }
+
+    static boolean isLight(Context context) {
+        return (context.getResources().getConfiguration().uiMode
+                & Configuration.UI_MODE_NIGHT_MASK) != Configuration.UI_MODE_NIGHT_YES;
+    }
+
+    static boolean enabled(Context context) {
+        return memory(context).getBoolean(ENABLED, true);
+    }
+
+    static void setEnabled(Context context, boolean enabled) {
+        memory(context).edit().putBoolean(ENABLED, enabled).apply();
+        if (enabled) {
+            applyNow(context);
+        }
+    }
+
+    /** The theme chosen for light or dark mode, or null when there is none yet. */
+    static String theme(Context context, boolean light) {
+        return memory(context).getString((light ? "light" : "dark") + THEME_SUFFIX, null);
+    }
+
+    static void setTheme(Context context, boolean light, String theme) {
+        String mode = light ? "light" : "dark";
+        memory(context).edit()
+                .putString(mode + THEME_SUFFIX, theme)
+                .remove(mode + BORDER_SUFFIX)
+                .apply();
+    }
+
+    /** Selects the current mode's theme right away, for changes made in the menu. */
+    static void applyNow(Context context) {
+        apply(context, isLight(context), true);
+    }
+
+    private static void apply(Context context, boolean wantLight, boolean force) {
+        if (!enabled(context)) {
+            return;
+        }
+        SharedPreferences gboard = gboardPreferences(context);
+        SharedPreferences memory = memory(context);
         String selected = gboard.getString(THEME_PREFERENCE, "");
         if (selected == null || selected.isEmpty()) {
             return;
@@ -78,7 +122,7 @@ public final class ThemeDarkMode {
         String rememberedTheme = memory.getString(mode + THEME_SUFFIX, null);
         String lastMode = memory.getString(LAST_MODE, null);
 
-        if (mode.equals(lastMode)) {
+        if (!force && mode.equals(lastMode)) {
             // Same mode as last time: whatever is selected now is this mode's choice.
             if (!selected.equals(rememberedTheme)) {
                 remember(memory, mode, selected, gboard);
@@ -125,7 +169,7 @@ public final class ThemeDarkMode {
     }
 
     /** Built-in themes always exist; imported ones can be deleted. */
-    private static boolean exists(Context context, String theme) {
+    static boolean exists(Context context, String theme) {
         if (!theme.startsWith(FILE_THEME_PREFIX)) {
             return true;
         }
@@ -164,7 +208,7 @@ public final class ThemeDarkMode {
         return best == null ? null : FILE_THEME_PREFIX + best.getName();
     }
 
-    private static ThemeInfo info(File file) {
+    static ThemeInfo info(File file) {
         String key = file.getName() + ":" + file.lastModified() + ":" + file.length();
         ThemeInfo cached = CACHE.get(key);
         if (cached != null) {
@@ -193,7 +237,7 @@ public final class ThemeDarkMode {
         }
     }
 
-    private static final class ThemeInfo {
+    static final class ThemeInfo {
         final String name;
         final boolean light;
         /** The name without its light or dark word, shared by both variants. */
