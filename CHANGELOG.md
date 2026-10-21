@@ -1,3 +1,9 @@
+## [1.9.1-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.9.0...v1.9.1-dev.1) (2026-10-21)
+
+### 🐛 Bug Fixes
+
+* Draw the press glow over the keyboard so the glass blur does not erase it ([4b856f4](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/4b856f4766f5e489c99fab4cd44d7a4bfa4ff532))
+
 ## [1.9.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.8.1...v1.9.0) (2026-10-21)
 
 ### ✨ New Features
