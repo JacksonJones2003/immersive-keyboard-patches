@@ -1,3 +1,9 @@
+## [1.9.4-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.9.3...v1.9.4-dev.1) (2026-10-21)
+
+### 🐛 Bug Fixes
+
+* Scale only the key rows so panel backgrounds stay put and edges stop flickering ([16c20b9](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/16c20b9c575092af5a0bd2395589fca5b3d8632a))
+
 ## [1.9.3](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.9.2...v1.9.3) (2026-10-21)
 
 ### 🐛 Bug Fixes
