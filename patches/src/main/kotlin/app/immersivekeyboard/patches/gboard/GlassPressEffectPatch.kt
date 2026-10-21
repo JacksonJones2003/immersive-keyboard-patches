@@ -24,8 +24,10 @@ val glassPressEffectPatch = bytecodePatch(
             "invoke-static { p0, p1 }, " +
                 "$EXTENSION_CLASS->onTouch(Landroid/view/View;Landroid/view/MotionEvent;)V"
         )
-        // Right after the bottom strip is painted and before the keyboard draws over it.
-        InputViewOnDrawStripFingerprint.let {
+        // After the keyboard has drawn. The glass blur clears whatever is painted beneath it,
+        // so the light has to go on top. The parameter registers are reused right after the
+        // super call, so hook directly behind it.
+        InputViewDispatchDrawFingerprint.let {
             it.method.addInstructions(
                 it.instructionMatches.first().index + 1,
                 "invoke-static { p0, p1 }, " +

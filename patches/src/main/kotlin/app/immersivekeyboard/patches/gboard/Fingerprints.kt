@@ -93,22 +93,6 @@ object InputViewDispatchDrawFingerprint : Fingerprint(
 )
 
 /**
- * InputView.onDraw at the point where it paints its bottom strip, before the keyboard is drawn.
- */
-object InputViewOnDrawStripFingerprint : Fingerprint(
-    definingClass = "Lcom/google/android/libraries/inputmethod/inputview/InputView;",
-    name = "onDraw",
-    returnType = "V",
-    parameters = listOf("Landroid/graphics/Canvas;"),
-    filters = listOf(
-        methodCall(
-            definingClass = "Landroid/graphics/Canvas;",
-            name = "drawRect",
-        )
-    )
-)
-
-/**
  * InputView.dispatchTouchEvent, which receives every touch on the keyboard.
  */
 object InputViewDispatchTouchFingerprint : Fingerprint(

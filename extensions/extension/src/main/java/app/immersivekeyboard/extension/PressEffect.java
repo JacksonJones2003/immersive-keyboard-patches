@@ -23,7 +23,7 @@ import java.util.WeakHashMap;
 public final class PressEffect {
     private static final long FLASH_RISE_MS = 70;
     private static final long FLASH_FADE_MS = 380;
-    private static final int FLASH_PEAK_ALPHA = 70;
+    private static final int FLASH_PEAK_ALPHA = 56;
     private static final float FLASH_RADIUS_FRACTION = 0.55f;
     private static final float PRESSED_SCALE = 0.988f;
     private static final long PRESS_MS = 90;
@@ -56,8 +56,8 @@ public final class PressEffect {
     }
 
     /**
-     * Injection point. Called from InputView.onDraw, before the keyboard itself is drawn, so the
-     * light sits on the glass behind the keys.
+     * Injection point. Called from InputView.dispatchDraw once the keyboard has drawn. The glass
+     * blur clears anything painted beneath it, so the light is laid over the finished keyboard.
      */
     public static void draw(View inputView, Canvas canvas) {
         try {
