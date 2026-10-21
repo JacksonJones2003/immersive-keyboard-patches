@@ -1,3 +1,9 @@
+## [1.10.0-dev.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.10.0-dev.1...v1.10.0-dev.2) (2026-10-21)
+
+### ✨ New Features
+
+* Add a Light & dark pair menu to the Themes screen ([2623805](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/262380556d6d0bbd24c795cd78dc7f6d81c7cabc))
+
 ## [1.10.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.9.5...v1.10.0-dev.1) (2026-10-21)
 
 ### ✨ New Features
