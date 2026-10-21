@@ -1,3 +1,9 @@
+## [1.12.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.11.0...v1.12.0-dev.1) (2026-10-21)
+
+### ✨ New Features
+
+* Keep the toolbar row still while it lights up on touch ([529df02](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/529df023ecd70c0e03949ce4fce25ea03184cddb))
+
 ## [1.11.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.10.0...v1.11.0) (2026-10-21)
 
 ### ✨ New Features
