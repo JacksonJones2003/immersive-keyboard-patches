@@ -169,6 +169,11 @@ public final class BottomBarOpacity {
         return true;
     }
 
+    /** Blur radius set in GboardWu's Frosted Glass settings, in pixels. */
+    static int frostedBlurRadiusPx(Context context) {
+        return FrostedGlass.read(context).blurRadiusPx;
+    }
+
     private static int withAlpha(int color, int alpha) {
         return (color & 0x00FFFFFF) | (alpha << 24);
     }

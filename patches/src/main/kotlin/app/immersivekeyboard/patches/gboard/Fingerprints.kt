@@ -130,3 +130,17 @@ object FloatingPopupPositionFingerprint : Fingerprint(
         methodCall(name = "setY")
     )
 )
+
+/**
+ * The floating popup layer's dispatchTouchEvent, which checks touches against each popup's
+ * visible area before passing them on.
+ */
+object FloatingPopupTouchFingerprint : Fingerprint(
+    name = "dispatchTouchEvent",
+    returnType = "Z",
+    parameters = listOf("Landroid/view/MotionEvent;"),
+    filters = listOf(
+        methodCall(name = "getGlobalVisibleRect"),
+        methodCall(name = "getChildAt")
+    )
+)
