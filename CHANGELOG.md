@@ -1,3 +1,9 @@
+## [1.16.3-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.16.2...v1.16.3-dev.1) (2026-10-27)
+
+### 🐛 Bug Fixes
+
+* Blur the keyboard in one-handed mode, where Frosted Glass cannot handle the panel's outline ([c2a3740](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/c2a37401360a05a698213d79e9aefb39081cdf91))
+
 ## [1.16.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.16.1...v1.16.2) (2026-10-27)
 
 ### 🐛 Bug Fixes
