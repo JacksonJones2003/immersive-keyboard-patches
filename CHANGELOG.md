@@ -1,3 +1,9 @@
+## [1.15.1-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.15.0...v1.15.1-dev.1) (2026-10-27)
+
+### 🐛 Bug Fixes
+
+* Keep the hardware keyboard switcher inside the keyboard window in edge-to-edge mode ([bac5080](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/bac50803916a1bafd0ee0694e2c8a3085271c17f))
+
 ## [1.15.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.14.1...v1.15.0) (2026-10-27)
 
 ### ✨ New Features

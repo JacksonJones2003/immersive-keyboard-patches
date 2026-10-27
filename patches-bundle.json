@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-27T04:48:27",
-  "description": "## [1.15.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.14.1...v1.15.0) (2026-10-27)\n\n### ✨ New Features\n\n* Support Gboard 18.5.4.993608717, the build Gboard Patches 4.x targets ([6824811](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/68248116f51ffed1a529687d89dbbc7ebc36fe42))",
-  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.15.0/patches-1.15.0.mpp",
+  "created_at": "2026-10-27T05:05:38",
+  "description": "## [1.15.1-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.15.0...v1.15.1-dev.1) (2026-10-27)\n\n### 🐛 Bug Fixes\n\n* Keep the hardware keyboard switcher inside the keyboard window in edge-to-edge mode ([bac5080](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/bac50803916a1bafd0ee0694e2c8a3085271c17f))",
+  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.15.1-dev.1/patches-1.15.1-dev.1.mpp",
   "signature_download_url": "",
-  "version": "1.15.0"
+  "version": "1.15.1-dev.1"
 }
