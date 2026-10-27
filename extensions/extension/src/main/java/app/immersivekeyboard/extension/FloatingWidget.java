@@ -109,7 +109,8 @@ public final class FloatingWidget {
                 ? ((ViewGroup) container).getChildAt(0) : null;
     }
 
-    private static boolean inputViewShown(View view) {
+    /** Whether the on-screen keyboard is showing in the window that holds this view. */
+    static boolean inputViewShown(View view) {
         View inputView = find(view);
         return inputView != null && inputView.isShown() && inputView.getHeight() > 0;
     }

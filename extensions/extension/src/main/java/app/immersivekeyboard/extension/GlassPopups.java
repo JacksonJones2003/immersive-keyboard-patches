@@ -26,10 +26,10 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
- * Gives Gboard's floating popups, such as the keyboard switcher shown while a hardware
- * keyboard is in use and the menu it opens, the same liquid glass as the keyboard: the
- * system's refracting glass material behind them, and the light that blooms from the finger
- * when they are touched.
+ * Gives the floating popups Gboard shows while a hardware keyboard is in use, the keyboard
+ * switcher and the menu it opens, the same liquid glass as the keyboard: the system's
+ * refracting glass material behind them, and the light that blooms from the finger when they
+ * are touched. Popups over the on-screen keyboard already sit on its glass and are left alone.
  */
 @SuppressWarnings("unused")
 public final class GlassPopups {
@@ -96,6 +96,10 @@ public final class GlassPopups {
                 return;
             }
             View content = ((ViewGroup) container).getChildAt(0);
+            if (FloatingWidget.inputViewShown(container.getRootView())) {
+                restore(content);
+                return;
+            }
             View surface = findSurface(content, content.getWidth() * 0.8f,
                     content.getHeight() * 0.8f);
             if (surface == null) {
@@ -131,6 +135,29 @@ public final class GlassPopups {
         } catch (Throwable failure) {
             Log.w(TAG, "popup glass failed: " + failure);
         }
+    }
+
+    /** Puts back the original background of a popup that had glass. */
+    private static void restore(View content) {
+        for (Map.Entry<View, Glass> entry : new ArrayList<>(GLASS.entrySet())) {
+            View view = entry.getKey();
+            if (view != null && isWithin(view, content)
+                    && view.getBackground() == entry.getValue().background) {
+                view.setBackground(entry.getValue().original);
+                view.setForeground(null);
+                GLASS.remove(view);
+            }
+        }
+    }
+
+    private static boolean isWithin(View view, View ancestor) {
+        for (View current = view; current != null;
+                current = current.getParent() instanceof View ? (View) current.getParent() : null) {
+            if (current == ancestor) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** The outermost view that paints the popup's backdrop: its own panel, not a key. */
