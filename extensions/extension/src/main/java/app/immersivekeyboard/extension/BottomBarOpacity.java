@@ -324,6 +324,9 @@ public final class BottomBarOpacity {
             lastRefresh = now;
             cachedFallback = fallback;
             settings = FrostedGlass.read(inputView.getContext());
+            FrostedFallback.ensure(inputView, settings.enabled, settings.blurRadiusPx,
+                    settings.customAlpha, settings.cornerRadiusDp
+                            * inputView.getResources().getDisplayMetrics().density);
             squareKeyboardBlur(inputView);
             keyboardTop = findKeyboardTop(inputView);
             keyboardHidden = isKeyboardHidden(inputView);
