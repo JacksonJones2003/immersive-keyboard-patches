@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-27T06:14:42",
-  "description": "## [1.16.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.15.4...v1.16.0) (2026-10-27)\n\n### ✨ New Features\n\n* Give floating popups like the hardware keyboard switcher the keyboard's liquid glass and touch light ([41e50b6](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/41e50b6cd31779745daab90807dd2a7f92174990))",
-  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.16.0/patches-1.16.0.mpp",
+  "created_at": "2026-10-27T15:09:32",
+  "description": "## [1.16.1-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.16.0...v1.16.1-dev.1) (2026-10-27)\n\n### 🐛 Bug Fixes\n\n* Only give popups their own glass while a hardware keyboard hides the on-screen keyboard ([5fd4422](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/5fd442268ef4c1fde32f1ca7b0e47fc47ba6cd5e))",
+  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.16.1-dev.1/patches-1.16.1-dev.1.mpp",
   "signature_download_url": "",
-  "version": "1.16.0"
+  "version": "1.16.1-dev.1"
 }

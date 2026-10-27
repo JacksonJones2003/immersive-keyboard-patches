@@ -1,3 +1,9 @@
+## [1.16.1-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.16.0...v1.16.1-dev.1) (2026-10-27)
+
+### 🐛 Bug Fixes
+
+* Only give popups their own glass while a hardware keyboard hides the on-screen keyboard ([5fd4422](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/5fd442268ef4c1fde32f1ca7b0e47fc47ba6cd5e))
+
 ## [1.16.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.15.4...v1.16.0) (2026-10-27)
 
 ### ✨ New Features
