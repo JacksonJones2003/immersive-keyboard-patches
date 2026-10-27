@@ -124,7 +124,18 @@ public final class FloatingWidget {
         }
         for (int index = 0; index < layer.getChildCount(); index++) {
             View container = layer.getChildAt(index);
-            container.setY(container.getY() + shift);
+            View content = content(container);
+            float offset = content.getTop() + content.getTranslationY();
+            if (shift > 0 && content != container && offset < 0) {
+                // Gboard lifts a menu above its container by translating it. Touches only
+                // reach what lies inside the container, so bring the menu back into it
+                // rather than moving the container: same place on screen, but tappable.
+                float intoContainer = Math.min(shift, -offset);
+                content.setTranslationY(content.getTranslationY() + intoContainer);
+                container.setY(container.getY() + shift - intoContainer);
+            } else {
+                container.setY(container.getY() + shift);
+            }
         }
         grown += shift;
         GROWN.put(layer, grown);
