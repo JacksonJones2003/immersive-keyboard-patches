@@ -1,37 +1,39 @@
 package app.immersivekeyboard.extension;
 
-import android.graphics.Outline;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewOutlineProvider;
 
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
- * Stands in for Frosted Glass where it gives up. Frosted Glass only blurs a keyboard panel
- * whose outline is a plain rectangle or a rounded rectangle with one radius, and in
- * one-handed mode Gboard outlines its floating panel in another way, so Frosted Glass leaves
- * the whole keyboard solid. When that happens this applies the same blur and see-through
- * panels with Frosted Glass's own settings, so the glass and the bottom strip work as usual.
+ * Stands in for Frosted Glass where it gives up, as it does in one-handed mode, leaving the
+ * whole keyboard solid. When Frosted Glass is on but the keyboard panel still has no blur a
+ * moment after it was laid out, this applies the same blur and see-through panels with
+ * Frosted Glass's own settings, so the glass and the bottom strip work as usual.
  */
 final class FrostedFallback {
     private static final String ROOT_TAG = ".keyboard-base-area.keyboard-outline";
     private static final String FLOATING_ROOT_TAG = ".keyboard-base-area";
 
+    /** How long Frosted Glass gets to blur a panel before this steps in. */
+    private static final long GRACE_MS = 400;
+
     /** Keyboard panels this has given a blur, with the background they had before. */
     private static final Map<View, Drawable[]> APPLIED = new WeakHashMap<>();
+    /** When each panel was first seen without any blur. */
+    private static final Map<View, Long> UNBLURRED_SINCE = new WeakHashMap<>();
 
     private FrostedFallback() {
     }
 
     /**
      * Called while the keyboard draws. Blurs the keyboard panel if Frosted Glass is on but
-     * cannot, and takes the blur away again once Frosted Glass can do it itself.
+     * has not blurred it, and takes the blur away again if Frosted Glass is turned off.
      */
     static void ensure(View inputView, boolean frostedEnabled, int blurRadiusPx, int surfaceAlpha,
             float cornerRadiusPx) {
@@ -44,18 +46,30 @@ final class FrostedFallback {
         }
         Drawable[] applied = APPLIED.get(root);
         boolean ours = applied != null && root.getBackground() == applied[1];
-        boolean needed = frostedEnabled && !frostedCanShape(root, ours ? applied[0]
-                : root.getBackground());
-        if (!needed) {
+        if (!frostedEnabled) {
             if (ours) {
                 root.setBackground(applied[0]);
             }
             APPLIED.remove(root);
+            UNBLURRED_SINCE.remove(root);
             return;
         }
         if (!ours) {
+            APPLIED.remove(root);
             Drawable original = root.getBackground();
             if (containsBlur(original)) {
+                // Frosted Glass has done it.
+                UNBLURRED_SINCE.remove(root);
+                return;
+            }
+            long now = SystemClock.uptimeMillis();
+            Long since = UNBLURRED_SINCE.get(root);
+            if (since == null) {
+                UNBLURRED_SINCE.put(root, now);
+                root.postDelayed(root::invalidate, GRACE_MS + 50);
+                return;
+            }
+            if (now - since < GRACE_MS) {
                 return;
             }
             Drawable blur = createBlur(root, blurRadiusPx, cornerRadiusPx);
@@ -66,31 +80,11 @@ final class FrostedFallback {
                     : new LayerDrawable(new Drawable[]{original, blur});
             root.setBackground(layered);
             APPLIED.put(root, new Drawable[]{original, layered});
+            UNBLURRED_SINCE.remove(root);
         }
         if (surfaceAlpha >= 0) {
             applySurfaceAlpha(inputView, surfaceAlpha);
         }
-    }
-
-    /** The same shape check Frosted Glass makes before it blurs a panel. */
-    private static boolean frostedCanShape(View root, Drawable background) {
-        if (root.getWidth() <= 0 || root.getHeight() <= 0) {
-            return true;
-        }
-        ViewOutlineProvider provider = root.getOutlineProvider();
-        Outline outline = new Outline();
-        if (root.getClipToOutline() && provider != null
-                && provider != ViewOutlineProvider.BACKGROUND) {
-            provider.getOutline(root, outline);
-        } else if (background != null) {
-            background.getOutline(outline);
-        } else {
-            return true;
-        }
-        Rect rect = new Rect();
-        float radius = outline.getRadius();
-        return outline.getRect(rect) && !rect.isEmpty() && radius >= 0
-                && !Float.isNaN(radius) && !Float.isInfinite(radius);
     }
 
     /** The see-through panels Frosted Glass sets to its custom opacity. */
