@@ -1,3 +1,10 @@
+## [1.15.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.15.0...v1.15.1) (2026-10-27)
+
+### 🐛 Bug Fixes
+
+* Keep the hardware keyboard switcher inside the keyboard window in edge-to-edge mode ([bac5080](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/bac50803916a1bafd0ee0694e2c8a3085271c17f))
+* Match the popup positioning method on Gboard 18.0.3 as well ([57f0297](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/57f029790ff8e1dd53f7d1a6a4a73e91913a305b))
+
 ## [1.15.1-dev.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.15.1-dev.1...v1.15.1-dev.2) (2026-10-27)
 
 ### 🐛 Bug Fixes
