@@ -1,3 +1,9 @@
+## [1.15.3-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.15.2...v1.15.3-dev.1) (2026-10-27)
+
+### 🐛 Bug Fixes
+
+* Keep the hardware keyboard switcher's menu tappable after making room for it ([ffae652](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/ffae652e66e279be3f367c9c8e4736e723b2c790))
+
 ## [1.15.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.15.1...v1.15.2) (2026-10-27)
 
 ### 🐛 Bug Fixes
