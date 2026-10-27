@@ -1,3 +1,9 @@
+## [1.16.5](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.16.4...v1.16.5) (2026-10-27)
+
+### 🐛 Bug Fixes
+
+* Tint the side-button column in one-handed mode to match the keyboard ([d86f06c](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/d86f06c05b821833f2c323d56e37acc057dee1ea))
+
 ## [1.16.5-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.16.4...v1.16.5-dev.1) (2026-10-27)
 
 ### 🐛 Bug Fixes
