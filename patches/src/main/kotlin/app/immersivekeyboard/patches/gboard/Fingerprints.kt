@@ -115,3 +115,19 @@ object ThemeListingCreateViewFingerprint : Fingerprint(
         "Landroid/os/Bundle;"
     )
 )
+
+/**
+ * Places a floating popup, such as the hardware keyboard switcher, by moving its container to
+ * a screen position relative to the popup layer: getLocationOnScreen, setClipChildren(false),
+ * then setX and setY on the container.
+ */
+object FloatingPopupPositionFingerprint : Fingerprint(
+    returnType = "V",
+    parameters = listOf("Landroid/view/View;", "[F", "L", "Z"),
+    filters = listOf(
+        methodCall(name = "getLocationOnScreen"),
+        methodCall(name = "setClipChildren"),
+        methodCall(name = "setX"),
+        methodCall(name = "setY")
+    )
+)
