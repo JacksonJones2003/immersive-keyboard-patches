@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-27T05:43:25",
-  "description": "## [1.15.3](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.15.2...v1.15.3) (2026-10-27)\n\n### 🐛 Bug Fixes\n\n* Keep the hardware keyboard switcher's menu tappable after making room for it ([ffae652](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/ffae652e66e279be3f367c9c8e4736e723b2c790))",
-  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.15.3/patches-1.15.3.mpp",
+  "created_at": "2026-10-27T05:54:06",
+  "description": "## [1.15.4-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.15.3...v1.15.4-dev.1) (2026-10-27)\n\n### 🐛 Bug Fixes\n\n* Give the hardware keyboard switcher a full-height layer so its menu opens at full size ([3bda3a6](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/3bda3a6bfc8da7a11613727c2746cdfb2b721ad5))",
+  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.15.4-dev.1/patches-1.15.4-dev.1.mpp",
   "signature_download_url": "",
-  "version": "1.15.3"
+  "version": "1.15.4-dev.1"
 }
