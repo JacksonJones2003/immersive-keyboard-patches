@@ -1,3 +1,9 @@
+## [1.15.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.14.1...v1.15.0-dev.1) (2026-10-27)
+
+### ✨ New Features
+
+* Support Gboard 18.5.4.993608717, the build Gboard Patches 4.x targets ([6824811](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/68248116f51ffed1a529687d89dbbc7ebc36fe42))
+
 ## [1.14.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.14.0...v1.14.1) (2026-10-27)
 
 ### 🐛 Bug Fixes
