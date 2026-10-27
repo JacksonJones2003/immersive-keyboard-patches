@@ -687,8 +687,13 @@ public final class BottomBarOpacity {
             float density = inputView.getResources().getDisplayMetrics().density;
             float stripTop = inputView.getHeight() - padding;
             List<View> panels = new ArrayList<>();
-            collectPanels(inputView, originX + inputView.getWidth() / 2f,
-                    originY + stripTop - 2f * density, inputView.getWidth() * 0.8f, panels);
+            float sampleX = originX + inputView.getWidth() / 2f;
+            float sampleY = originY + stripTop - 2f * density;
+            collectPanels(inputView, sampleX, sampleY, inputView.getWidth() * 0.8f, panels);
+            // Panels Gboard opens over the keyboard, like the toolbar's "more" menu, live
+            // outside InputView but are what sits just above the strip while they are open.
+            collectOverlayPanels(inputView.getRootView(), inputView, sampleX, sampleY,
+                    inputView.getWidth() * 0.8f, panels);
             if (panels.isEmpty()) {
                 return false;
             }
@@ -733,6 +738,35 @@ public final class BottomBarOpacity {
                     collectPanels(group.getChildAt(index), windowX, windowY, minWidth, out);
                 }
             }
+        }
+
+        /** Like collectPanels, but for the views outside InputView, which drew underneath. */
+        private void collectOverlayPanels(View view, View inputView, float windowX,
+                float windowY, float minWidth, List<View> out) {
+            if (view == inputView || view.getVisibility() != View.VISIBLE) {
+                return;
+            }
+            if (!isAncestor(view, inputView)) {
+                collectPanels(view, windowX, windowY, minWidth, out);
+                return;
+            }
+            if (view instanceof ViewGroup) {
+                ViewGroup group = (ViewGroup) view;
+                for (int index = 0; index < group.getChildCount(); index++) {
+                    collectOverlayPanels(group.getChildAt(index), inputView, windowX, windowY,
+                            minWidth, out);
+                }
+            }
+        }
+
+        private static boolean isAncestor(View ancestor, View view) {
+            for (ViewParent parent = view.getParent(); parent != null;
+                    parent = parent.getParent()) {
+                if (parent == ancestor) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /** Alpha of a view as drawn, including that of its parents up to InputView. */
