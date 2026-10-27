@@ -123,7 +123,6 @@ object ThemeListingCreateViewFingerprint : Fingerprint(
  */
 object FloatingPopupPositionFingerprint : Fingerprint(
     returnType = "V",
-    parameters = listOf("Landroid/view/View;", "[F", "L", "Z"),
     filters = listOf(
         methodCall(name = "getLocationOnScreen"),
         methodCall(name = "setClipChildren"),
