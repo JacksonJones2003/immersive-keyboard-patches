@@ -1,3 +1,9 @@
+## [1.15.2-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.15.1...v1.15.2-dev.1) (2026-10-27)
+
+### 🐛 Bug Fixes
+
+* Grow the keyboard window to fit the hardware keyboard switcher's menu ([b1b83c9](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/b1b83c99ec8101870a30bfe0dd1bc357491c8307))
+
 ## [1.15.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.15.0...v1.15.1) (2026-10-27)
 
 ### 🐛 Bug Fixes
