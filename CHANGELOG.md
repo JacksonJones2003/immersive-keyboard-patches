@@ -1,3 +1,9 @@
+## [1.16.2-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.16.1...v1.16.2-dev.1) (2026-10-27)
+
+### 🐛 Bug Fixes
+
+* Match the bottom strip to panels opened over the keyboard ([2c26162](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/2c261625ab59717e04ccf22d35345af08b556a5c))
+
 ## [1.16.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.16.0...v1.16.1) (2026-10-27)
 
 ### 🐛 Bug Fixes

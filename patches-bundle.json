@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-27T15:12:08",
-  "description": "## [1.16.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.16.0...v1.16.1) (2026-10-27)\n\n### 🐛 Bug Fixes\n\n* Only give popups their own glass while a hardware keyboard hides the on-screen keyboard ([5fd4422](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/5fd442268ef4c1fde32f1ca7b0e47fc47ba6cd5e))",
-  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.16.1/patches-1.16.1.mpp",
+  "created_at": "2026-10-27T15:23:36",
+  "description": "## [1.16.2-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.16.1...v1.16.2-dev.1) (2026-10-27)\n\n### 🐛 Bug Fixes\n\n* Match the bottom strip to panels opened over the keyboard ([2c26162](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/2c261625ab59717e04ccf22d35345af08b556a5c))",
+  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.16.2-dev.1/patches-1.16.2-dev.1.mpp",
   "signature_download_url": "",
-  "version": "1.16.1"
+  "version": "1.16.2-dev.1"
 }
