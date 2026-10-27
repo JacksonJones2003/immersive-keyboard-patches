@@ -1,3 +1,9 @@
+## [1.16.4](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.16.3...v1.16.4) (2026-10-27)
+
+### 🐛 Bug Fixes
+
+* Step in whenever Frosted Glass leaves the keyboard unblurred, not only for outlines it rejects ([71db588](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/71db5885a09ed770fb602934ca14c222a3ec9b54))
+
 ## [1.16.4-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.16.3...v1.16.4-dev.1) (2026-10-27)
 
 ### 🐛 Bug Fixes
