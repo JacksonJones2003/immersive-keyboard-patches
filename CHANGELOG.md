@@ -1,3 +1,9 @@
+## [1.16.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.15.4...v1.16.0-dev.1) (2026-10-27)
+
+### ✨ New Features
+
+* Give floating popups like the hardware keyboard switcher the keyboard's liquid glass and touch light ([41e50b6](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/41e50b6cd31779745daab90807dd2a7f92174990))
+
 ## [1.15.4](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.15.3...v1.15.4) (2026-10-27)
 
 ### 🐛 Bug Fixes

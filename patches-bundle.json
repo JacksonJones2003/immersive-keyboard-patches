@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-27T05:55:59",
-  "description": "## [1.15.4](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.15.3...v1.15.4) (2026-10-27)\n\n### 🐛 Bug Fixes\n\n* Give the hardware keyboard switcher a full-height layer so its menu opens at full size ([3bda3a6](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/3bda3a6bfc8da7a11613727c2746cdfb2b721ad5))",
-  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.15.4/patches-1.15.4.mpp",
+  "created_at": "2026-10-27T06:11:53",
+  "description": "## [1.16.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.15.4...v1.16.0-dev.1) (2026-10-27)\n\n### ✨ New Features\n\n* Give floating popups like the hardware keyboard switcher the keyboard's liquid glass and touch light ([41e50b6](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/41e50b6cd31779745daab90807dd2a7f92174990))",
+  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.16.0-dev.1/patches-1.16.0-dev.1.mpp",
   "signature_download_url": "",
-  "version": "1.15.4"
+  "version": "1.16.0-dev.1"
 }
