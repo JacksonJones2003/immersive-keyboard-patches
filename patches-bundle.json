@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-28T01:42:26",
-  "description": "## [1.18.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.17.0...v1.18.0-dev.1) (2026-10-28)\n\n### ✨ New Features\n\n* Offer vivo's built-in wallpapers for the light and dark mode wallpapers ([6fad9ee](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/6fad9ee44d4c3e09e4d8116f094961138e877f07))",
-  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.18.0-dev.1/patches-1.18.0-dev.1.mpp",
+  "created_at": "2026-10-28T01:45:03",
+  "description": "## [1.18.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.17.0...v1.18.0) (2026-10-28)\n\n### ✨ New Features\n\n* Offer vivo's built-in wallpapers for the light and dark mode wallpapers ([6fad9ee](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/6fad9ee44d4c3e09e4d8116f094961138e877f07))",
+  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.18.0/patches-1.18.0.mpp",
   "signature_download_url": "",
-  "version": "1.18.0-dev.1"
+  "version": "1.18.0"
 }
