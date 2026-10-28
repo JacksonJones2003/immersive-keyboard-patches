@@ -1,3 +1,9 @@
+## [1.20.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.19.0...v1.20.0) (2026-10-28)
+
+### ✨ New Features
+
+* Pick light and dark mode wallpapers in vivo Themes itself ([9a3c627](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/9a3c627e9b354a4d0bc4a30cd4418f3615dfe8d3))
+
 ## [1.20.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.19.0...v1.20.0-dev.1) (2026-10-28)
 
 ### ✨ New Features
