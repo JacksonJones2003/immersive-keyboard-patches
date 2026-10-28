@@ -256,21 +256,31 @@ public final class ThemePairMenu {
             if (!(host instanceof Activity)) {
                 return;
             }
-            if (!WallpaperSwitch.hasImage(context, light)) {
+            boolean vivo = VivoWallpapers.available(context);
+            boolean chosen = WallpaperSwitch.hasImage(context, light);
+            if (!vivo && !chosen) {
                 pickWallpaper((Activity) host, light);
                 return;
             }
+            List<CharSequence> options = new ArrayList<>();
+            List<Runnable> actions = new ArrayList<>();
+            options.add("Choose from photos");
+            actions.add(() -> pickWallpaper((Activity) host, light));
+            if (vivo) {
+                options.add("vivo wallpapers");
+                actions.add(() -> VivoWallpapers.choose(host, light, this::refresh));
+            }
+            if (chosen) {
+                options.add("Remove");
+                actions.add(() -> {
+                    WallpaperSwitch.remove(context, light);
+                    refresh();
+                });
+            }
             new AlertDialog.Builder(host)
                     .setTitle(light ? "Light mode wallpaper" : "Dark mode wallpaper")
-                    .setItems(new CharSequence[]{"Choose another image", "Remove"},
-                            (dialog, which) -> {
-                                if (which == 0) {
-                                    pickWallpaper((Activity) host, light);
-                                } else {
-                                    WallpaperSwitch.remove(context, light);
-                                    refresh();
-                                }
-                            })
+                    .setItems(options.toArray(new CharSequence[0]),
+                            (dialog, which) -> actions.get(which).run())
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
         }

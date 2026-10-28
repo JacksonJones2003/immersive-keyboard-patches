@@ -178,7 +178,19 @@ public final class WallpaperSwitch {
         transaction.add(picker, PICKER_TAG).commitNowAllowingStateLoss();
     }
 
+    /** Where a chosen image is read from. */
+    interface Source {
+        InputStream open() throws Exception;
+    }
+
     private static void save(Context context, Uri uri, boolean light, Runnable done) {
+        Context application = context.getApplicationContext();
+        save(application, () -> application.getContentResolver().openInputStream(uri), light,
+                done);
+    }
+
+    /** Copies the image for the mode, then uses it if that mode is showing. */
+    static void save(Context context, Source source, boolean light, Runnable done) {
         Context application = context.getApplicationContext();
         WORKER.execute(() -> {
             boolean saved = false;
@@ -189,7 +201,7 @@ public final class WallpaperSwitch {
                     folder.mkdirs();
                 }
                 File partial = new File(folder, file.getName() + ".part");
-                try (InputStream input = application.getContentResolver().openInputStream(uri);
+                try (InputStream input = source.open();
                         OutputStream output = new FileOutputStream(partial)) {
                     if (input == null) {
                         throw new IllegalStateException("no image");
