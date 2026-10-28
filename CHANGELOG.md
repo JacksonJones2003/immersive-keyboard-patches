@@ -1,3 +1,9 @@
+## [1.17.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.16.5...v1.17.0) (2026-10-28)
+
+### ✨ New Features
+
+* Switch the wallpaper between a light and a dark image with dark mode ([d806efb](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/d806efbbe4fcc69791852dde81d4ffa20b841729))
+
 ## [1.17.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.16.5...v1.17.0-dev.1) (2026-10-28)
 
 ### ✨ New Features
