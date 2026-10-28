@@ -6,11 +6,11 @@ import org.w3c.dom.Element
 
 private const val ANDROID_NS = "http://schemas.android.com/apk/res/android"
 private const val SET_WALLPAPER = "android.permission.SET_WALLPAPER"
-private const val VIVO_THEME_RESOURCES = "com.bbk.theme.resources"
+private val VIVO_WALLPAPER_PACKAGES = listOf("com.bbk.theme.resources", "com.vivo.livewallpaper.boxres")
 
 /**
  * Lets Gboard set the phone's wallpaper, for the wallpaper that follows dark mode, and see
- * vivo's theme resources, where vivo's own wallpapers come from.
+ * the vivo packages its own wallpapers come from.
  */
 internal val wallpaperPermissionPatch = resourcePatch {
     compatibleWith(COMPATIBILITY_GBOARD)
@@ -38,14 +38,16 @@ internal val wallpaperPermissionPatch = resourcePatch {
                 }
             }
             val packages = queries.getElementsByTagName("package")
-            val listed = (0 until packages.length).any {
-                (packages.item(it) as Element).getAttributeNS(ANDROID_NS, "name") ==
-                    VIVO_THEME_RESOURCES
-            }
-            if (!listed) {
-                queries.appendChild(document.createElement("package").apply {
-                    setAttributeNS(ANDROID_NS, "android:name", VIVO_THEME_RESOURCES)
-                })
+            VIVO_WALLPAPER_PACKAGES.forEach { packageName ->
+                val listed = (0 until packages.length).any {
+                    (packages.item(it) as Element).getAttributeNS(ANDROID_NS, "name") ==
+                        packageName
+                }
+                if (!listed) {
+                    queries.appendChild(document.createElement("package").apply {
+                        setAttributeNS(ANDROID_NS, "android:name", packageName)
+                    })
+                }
             }
         }
     }
