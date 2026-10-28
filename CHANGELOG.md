@@ -1,3 +1,9 @@
+## [1.19.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.18.0...v1.19.0) (2026-10-28)
+
+### ✨ New Features
+
+* Include vivo's theme, video, color and lock screen wallpapers in the vivo wallpaper grid ([7114df9](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/7114df9323a942e54095609d0225f33ef90f61e7))
+
 ## [1.19.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.18.0...v1.19.0-dev.1) (2026-10-28)
 
 ### ✨ New Features
