@@ -102,6 +102,11 @@ public final class WallpaperSwitch {
         update(context, ThemeDarkMode.isLight(context), true);
     }
 
+    /** Sets the wallpaper of the mode showing again, after something else changed it. */
+    static void reapply(Context context) {
+        update(context, ThemeDarkMode.isLight(context), true);
+    }
+
     static File image(Context context, boolean light) {
         return new File(new File(context.getFilesDir(), FOLDER), light ? "light" : "dark");
     }

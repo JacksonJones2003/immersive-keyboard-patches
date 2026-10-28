@@ -267,7 +267,9 @@ public final class ThemePairMenu {
             options.add("Choose from photos");
             actions.add(() -> pickWallpaper((Activity) host, light));
             if (vivo) {
-                options.add("vivo wallpapers");
+                options.add("Pick in vivo Themes");
+                actions.add(() -> VivoThemesPicker.pick((Activity) host, light, this::refresh));
+                options.add("Built-in vivo wallpapers");
                 actions.add(() -> VivoWallpapers.choose(host, light, this::refresh));
             }
             if (chosen) {
