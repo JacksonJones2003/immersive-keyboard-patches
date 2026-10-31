@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-31T17:27:53",
-  "description": "## [1.21.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.21.1...v1.21.2) (2026-10-31)\n\n### 🐛 Bug Fixes\n\n* Keep InputView drawing so the glass applies on a cold start ([d4de3b5](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/d4de3b57980c5f76ac6df0ffb407e5d0bd90d9b2))",
-  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.21.2/patches-1.21.2.mpp",
+  "created_at": "2026-10-31T17:42:36",
+  "description": "## [1.21.3-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.21.2...v1.21.3-dev.1) (2026-10-31)\n\n### 🐛 Bug Fixes\n\n* Keep Seamless Nav Bar off while the glass sheet is applied ([71f681e](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/71f681e038532de8c48a961ba119c8d43f1de499))",
+  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.21.3-dev.1/patches-1.21.3-dev.1.mpp",
   "signature_download_url": "",
-  "version": "1.21.2"
+  "version": "1.21.3-dev.1"
 }

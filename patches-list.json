@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.21.2",
+  "version": "1.21.3-dev.1",
   "patches": [
     {
       "name": "Emoji Key On Right",
@@ -45,7 +45,7 @@
     },
     {
       "name": "Glass Panel",
-      "description": "Turns the translucent keyboard panel into glass. On vivo OriginOS it uses the system's own glass material, with real refraction, rim light and dispersion; elsewhere it draws lit edges and a sheen. Keys are left as they are. Works on top of Translucent Bottom Bar and Frosted Glass. Floating popups, like the keyboard switcher shown with a hardware keyboard, get the same glass.",
+      "description": "Turns the translucent keyboard panel into glass. On vivo OriginOS it uses the system's own glass material, with real refraction, rim light and dispersion; elsewhere it draws lit edges and a sheen. Keys are left as they are. Works on top of Translucent Bottom Bar and Frosted Glass. Floating popups, like the keyboard switcher shown with a hardware keyboard, get the same glass. Keeps Frosted Glass's Seamless Nav Bar off, which conflicts with it.",
       "default": true,
       "category": null,
       "dependencies": [

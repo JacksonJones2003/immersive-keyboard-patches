@@ -1,3 +1,9 @@
+## [1.21.3-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.21.2...v1.21.3-dev.1) (2026-10-31)
+
+### 🐛 Bug Fixes
+
+* Keep Seamless Nav Bar off while the glass sheet is applied ([71f681e](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/71f681e038532de8c48a961ba119c8d43f1de499))
+
 ## [1.21.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.21.1...v1.21.2) (2026-10-31)
 
 ### 🐛 Bug Fixes
