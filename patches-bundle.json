@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-31T17:02:47",
-  "description": "## [1.21.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.20.1...v1.21.0-dev.1) (2026-10-31)\n\n### ✨ New Features\n\n* Add Key Mapper Watchdog patch ([3d86cc0](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/3d86cc07d6303ae54e5fefdf8c5912114ffdd60e))",
-  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.21.0-dev.1/patches-1.21.0-dev.1.mpp",
+  "created_at": "2026-10-31T17:05:14",
+  "description": "## [1.21.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.20.1...v1.21.0) (2026-10-31)\n\n### ✨ New Features\n\n* Add Key Mapper Watchdog patch ([3d86cc0](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/3d86cc07d6303ae54e5fefdf8c5912114ffdd60e))",
+  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.21.0/patches-1.21.0.mpp",
   "signature_download_url": "",
-  "version": "1.21.0-dev.1"
+  "version": "1.21.0"
 }

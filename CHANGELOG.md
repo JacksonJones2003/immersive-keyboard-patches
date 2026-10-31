@@ -1,3 +1,9 @@
+## [1.21.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.20.1...v1.21.0) (2026-10-31)
+
+### ✨ New Features
+
+* Add Key Mapper Watchdog patch ([3d86cc0](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/3d86cc07d6303ae54e5fefdf8c5912114ffdd60e))
+
 ## [1.21.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.20.1...v1.21.0-dev.1) (2026-10-31)
 
 ### ✨ New Features
