@@ -115,6 +115,13 @@ public final class BottomBarOpacity {
      */
     public static void afterKeyboardDrawn(View inputView, Canvas canvas) {
         try {
+            if (inputView.willNotDraw()) {
+                // Gboard skips InputView.onDraw while the navigation bar color is transparent,
+                // as it can be on a cold start. Everything here starts from onDraw, so without
+                // this the keyboard would keep plain Frosted Glass until it is rebuilt.
+                inputView.setWillNotDraw(false);
+                inputView.postInvalidate();
+            }
             State state = STATES.get(inputView);
             if (state != null && !state.keyboardHidden) {
                 state.repaintBottomCorners(inputView, canvas);
