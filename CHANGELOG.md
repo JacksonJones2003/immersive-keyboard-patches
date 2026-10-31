@@ -1,3 +1,9 @@
+## [1.21.1-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.21.0...v1.21.1-dev.1) (2026-10-31)
+
+### 🐛 Bug Fixes
+
+* Only stand in for Frosted Glass in one-handed mode ([e35ab89](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/e35ab8971644c4cc0cf97ad430b0aef0a1c4949a))
+
 ## [1.21.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.20.1...v1.21.0) (2026-10-31)
 
 ### ✨ New Features
