@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-31T17:15:08",
-  "description": "## [1.21.1-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.21.0...v1.21.1-dev.1) (2026-10-31)\n\n### 🐛 Bug Fixes\n\n* Only stand in for Frosted Glass in one-handed mode ([e35ab89](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/e35ab8971644c4cc0cf97ad430b0aef0a1c4949a))",
-  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.21.1-dev.1/patches-1.21.1-dev.1.mpp",
+  "created_at": "2026-10-31T17:17:17",
+  "description": "## [1.21.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.21.0...v1.21.1) (2026-10-31)\n\n### 🐛 Bug Fixes\n\n* Only stand in for Frosted Glass in one-handed mode ([e35ab89](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/e35ab8971644c4cc0cf97ad430b0aef0a1c4949a))",
+  "download_url": "https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/download/v1.21.1/patches-1.21.1.mpp",
   "signature_download_url": "",
-  "version": "1.21.1-dev.1"
+  "version": "1.21.1"
 }
