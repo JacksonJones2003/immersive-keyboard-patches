@@ -1,5 +1,7 @@
 package app.immersivekeyboard.extension;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.SystemClock;
@@ -55,7 +57,10 @@ final class FrostedFallback {
             return;
         }
         if (!ours) {
-            APPLIED.remove(root);
+            if (applied != null) {
+                unwrap(root, applied);
+                APPLIED.remove(root);
+            }
             Drawable original = root.getBackground();
             if (containsBlur(original)) {
                 // Frosted Glass has done it.
@@ -79,11 +84,32 @@ final class FrostedFallback {
             Drawable layered = original == null ? new LayerDrawable(new Drawable[]{blur})
                     : new LayerDrawable(new Drawable[]{original, blur});
             root.setBackground(layered);
-            APPLIED.put(root, new Drawable[]{original, layered});
+            APPLIED.put(root, new Drawable[]{original, layered, blur});
             UNBLURRED_SINCE.remove(root);
         }
         if (surfaceAlpha >= 0) {
             applySurfaceAlpha(inputView, surfaceAlpha);
+        }
+    }
+
+    /**
+     * Frosted Glass got there late and stacked its blur on top of this one, leaving two sheets
+     * of glass. Takes this one out, so the keyboard has only the one Frosted Glass manages.
+     */
+    private static void unwrap(View root, Drawable[] applied) {
+        Drawable background = root.getBackground();
+        if (!(background instanceof LayerDrawable)) {
+            return;
+        }
+        LayerDrawable layers = (LayerDrawable) background;
+        for (int index = 0; index < layers.getNumberOfLayers(); index++) {
+            if (layers.getDrawable(index) == applied[1]) {
+                applied[2].setVisible(false, false);
+                layers.setDrawable(index, applied[0] != null ? applied[0]
+                        : new ColorDrawable(Color.TRANSPARENT));
+                root.invalidate();
+                return;
+            }
         }
     }
 
