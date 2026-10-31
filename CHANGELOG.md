@@ -1,3 +1,9 @@
+## [1.20.1-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.20.0...v1.20.1-dev.1) (2026-10-31)
+
+### 🐛 Bug Fixes
+
+* Remove the fallback blur when Frosted Glass applies its own late ([ff598ea](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/ff598ead3e374793c1d09606aeb4c978c1da920f))
+
 ## [1.20.0](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.19.0...v1.20.0) (2026-10-28)
 
 ### ✨ New Features
