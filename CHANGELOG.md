@@ -1,3 +1,9 @@
+## [1.21.2](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.21.1...v1.21.2) (2026-10-31)
+
+### 🐛 Bug Fixes
+
+* Keep InputView drawing so the glass applies on a cold start ([d4de3b5](https://github.com/JacksonJones2003/immersive-keyboard-patches/commit/d4de3b57980c5f76ac6df0ffb407e5d0bd90d9b2))
+
 ## [1.21.2-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/compare/v1.21.1...v1.21.2-dev.1) (2026-10-31)
 
 ### 🐛 Bug Fixes
