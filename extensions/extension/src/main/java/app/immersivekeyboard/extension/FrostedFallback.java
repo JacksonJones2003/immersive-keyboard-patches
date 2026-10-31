@@ -13,17 +13,18 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
- * Stands in for Frosted Glass where it gives up, as it does in one-handed mode, leaving the
- * whole keyboard solid. When Frosted Glass is on but the keyboard panel still has no blur a
- * moment after it was laid out, this applies the same blur and see-through panels with
- * Frosted Glass's own settings, so the glass and the bottom strip work as usual.
+ * Stands in for Frosted Glass in one-handed mode, where it gives up and leaves the whole
+ * keyboard solid. When the keyboard panel still has no blur a moment after one-handed mode
+ * was laid out, this applies the same blur and see-through panels with Frosted Glass's own
+ * settings. Everywhere else the panel is left to Frosted Glass alone, which can be slow to
+ * start; getting in first there left two blurs fighting over the panel.
  */
 final class FrostedFallback {
     private static final String ROOT_TAG = ".keyboard-base-area.keyboard-outline";
     private static final String FLOATING_ROOT_TAG = ".keyboard-base-area";
 
     /** How long Frosted Glass gets to blur a panel before this steps in. */
-    private static final long GRACE_MS = 400;
+    private static final long GRACE_MS = 1000;
 
     /** Keyboard panels this has given a blur, with the background they had before. */
     private static final Map<View, Drawable[]> APPLIED = new WeakHashMap<>();
@@ -48,17 +49,20 @@ final class FrostedFallback {
         }
         Drawable[] applied = APPLIED.get(root);
         boolean ours = applied != null && root.getBackground() == applied[1];
-        if (!frostedEnabled) {
+        if (!frostedEnabled || !isOneHanded(inputView)) {
             if (ours) {
                 root.setBackground(applied[0]);
             }
-            APPLIED.remove(root);
+            if (applied != null) {
+                removeBlur(root, applied);
+                APPLIED.remove(root);
+            }
             UNBLURRED_SINCE.remove(root);
             return;
         }
         if (!ours) {
             if (applied != null) {
-                unwrap(root, applied);
+                removeBlur(root, applied);
                 APPLIED.remove(root);
             }
             Drawable original = root.getBackground();
@@ -93,24 +97,40 @@ final class FrostedFallback {
     }
 
     /**
-     * Frosted Glass got there late and stacked its blur on top of this one, leaving two sheets
-     * of glass. Takes this one out, so the keyboard has only the one Frosted Glass manages.
+     * Takes this class's blur out of the background it made. Frosted Glass may have stacked
+     * that background under its own blur, or kept it to restore later, so emptying it in place
+     * is what guarantees the dead blur is never found again.
      */
-    private static void unwrap(View root, Drawable[] applied) {
-        Drawable background = root.getBackground();
-        if (!(background instanceof LayerDrawable)) {
-            return;
-        }
-        LayerDrawable layers = (LayerDrawable) background;
+    private static void removeBlur(View root, Drawable[] applied) {
+        LayerDrawable layers = (LayerDrawable) applied[1];
         for (int index = 0; index < layers.getNumberOfLayers(); index++) {
-            if (layers.getDrawable(index) == applied[1]) {
+            if (layers.getDrawable(index) == applied[2]) {
                 applied[2].setVisible(false, false);
-                layers.setDrawable(index, applied[0] != null ? applied[0]
-                        : new ColorDrawable(Color.TRANSPARENT));
+                layers.setDrawable(index, new ColorDrawable(Color.TRANSPARENT));
                 root.invalidate();
                 return;
             }
         }
+    }
+
+    /** One-handed mode shrinks the keys to one side, with the side buttons beside them. */
+    private static boolean isOneHanded(View view) {
+        if (view.getVisibility() != View.VISIBLE) {
+            return false;
+        }
+        if (view.getClass().getName().endsWith(".KeyboardHolder")) {
+            return view.getParent() instanceof View && view.getWidth() > 0
+                    && view.getWidth() < ((View) view.getParent()).getWidth() * 0.95f;
+        }
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+            for (int index = 0; index < group.getChildCount(); index++) {
+                if (isOneHanded(group.getChildAt(index))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /** The see-through panels Frosted Glass sets to its custom opacity. */
