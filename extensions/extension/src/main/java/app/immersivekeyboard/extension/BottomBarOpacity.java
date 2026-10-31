@@ -62,6 +62,7 @@ public final class BottomBarOpacity {
     private static final float FROSTED_GLASS_CORNER_RADIUS_DP = 32.0f;
     /** Top corner radius of the glass sheet, close to the keyboard panel in iOS. */
     private static final float GLASS_TOP_RADIUS_DP = 28.0f;
+    private static final String SEAMLESS_NAV_BAR_ENABLED = "pref_seamless_nav_bar_enabled";
     private static final String ROUNDED_PANEL_ENABLED = "pref_rounded_keyboard_panel_enabled";
     private static final String ROUNDED_PANEL_MODE = "pref_rounded_keyboard_panel_mode";
     private static final String ROUNDED_PANEL_BOTTOM_RADIUS =
@@ -221,6 +222,14 @@ public final class BottomBarOpacity {
                 SharedPreferences preferences = (application == null ? context : application)
                         .getSharedPreferences(FROSTED_GLASS_PREFERENCES, Context.MODE_PRIVATE);
                 Map<String, ?> values = preferences.getAll();
+                // Frosted Glass's Seamless Nav Bar, on unless turned off, also takes over the
+                // strip and reshapes the blur, which knocks the glass sheet out. The sheet
+                // covers the strip already, so keep it off whenever Glass Panel is applied.
+                if (GlassPanel.isEnabled() && !"false".equalsIgnoreCase(
+                        String.valueOf(values.get(SEAMLESS_NAV_BAR_ENABLED)))) {
+                    preferences.edit().putBoolean(SEAMLESS_NAV_BAR_ENABLED, false).apply();
+                    Log.i(TAG, "turned off Seamless Nav Bar for the glass sheet");
+                }
                 if (!"true".equalsIgnoreCase(String.valueOf(values.get(FROSTED_GLASS_ENABLED)))) {
                     return OFF;
                 }
