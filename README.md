@@ -18,9 +18,9 @@ Click here to add these patches to Morphe: https://morphe.software/add-source?gi
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.20.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/tag/v1.20.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;6 patches total
+> **[v1.21.0-dev.1](https://github.com/JacksonJones2003/immersive-keyboard-patches/releases/tag/v1.21.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;7 patches total
 <details open>
-<summary>📦 Gboard&nbsp;&nbsp;•&nbsp;&nbsp;6 patches</summary>
+<summary>📦 Gboard&nbsp;&nbsp;•&nbsp;&nbsp;7 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -34,6 +34,7 @@ Click here to add these patches to Morphe: https://morphe.software/add-source?gi
 | [Glass Panel](#glass-panel) | Turns the translucent keyboard panel into glass. On vivo OriginOS it uses the system's own glass material, with real refraction, rim light and dispersion; elsewhere it draws lit edges and a sheen. Keys are left as they are. Works on top of Translucent Bottom Bar and Frosted Glass. Floating popups, like the keyboard switcher shown with a hardware keyboard, get the same glass. |  |
 | [Glass Press Effect](#glass-press-effect) | Adds vivo-style liquid glass touch feedback: a soft light blooms out from your finger across the keyboard background, and the keys around your finger dip and spring back with a small wobble while the rest of the keyboard stays still. When glide typing, the dip follows your finger. Floating popups light up the same way. |  |
 | [Immersive Keyboard](#immersive-keyboard) | Extends the keyboard under the camera cutout in landscape instead of leaving an empty strip beside it. |  |
+| [Key Mapper Watchdog](#key-mapper-watchdog) | Uses Shizuku to restart Key Mapper's Expert Mode system bridge when it stops, or holds no input device, which shows up in Key Mapper as "Trigger device not connected!". Expert Mode stopped on purpose comes back too. Gboard asks for Shizuku access the first time it runs. Lets Gboard run shell commands, so only use it if you want this. |  |
 | [Theme Follows Dark Mode](#theme-follows-dark-mode) | Adds a "Light & dark pair" menu to the top of Gboard's Themes screen. Choose a theme for light mode and one for dark mode, and the keyboard switches between them when the system dark mode changes. It can switch the wallpaper between a light and a dark image too. |  |
 | [Translucent Bottom Bar](#translucent-bottom-bar) | Makes the bar under the keyboard (behind the globe and close buttons) match the keyboard's color, opacity and blur, for use with transparent themes such as Frosted Glass. |  |
 
