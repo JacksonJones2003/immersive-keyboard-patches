@@ -1204,8 +1204,26 @@ public final class BottomBarOpacity {
                     || keyboardTop == NO_TOP || Color.alpha(drawnColor) >= OPAQUE) {
                 return;
             }
-            GlassPanel.drawOnTop(canvas, 0, topInInputView(inputView), inputView.getWidth(),
+            float topY = topInInputView(inputView);
+            float radius = settings.cornerRadiusDp
+                    * inputView.getResources().getDisplayMetrics().density;
+            int save = -1;
+            if (radius > 0.5f) {
+                // Clip the rim to the keyboard panel's rounded top corners so it
+                // never spills past them. Reuses the same cornerPath shape the
+                // panel's corner-wedge fill already builds.
+                cornerPath.rewind();
+                cornerPath.addRoundRect(0, topY, inputView.getWidth(), inputView.getHeight(),
+                        new float[]{radius, radius, radius, radius, 0, 0, 0, 0},
+                        Path.Direction.CW);
+                save = canvas.save();
+                canvas.clipPath(cornerPath);
+            }
+            GlassPanel.drawOnTop(canvas, 0, topY, inputView.getWidth(),
                     inputView.getResources().getDisplayMetrics().density);
+            if (save != -1) {
+                canvas.restoreToCount(save);
+            }
         }
 
         /**
