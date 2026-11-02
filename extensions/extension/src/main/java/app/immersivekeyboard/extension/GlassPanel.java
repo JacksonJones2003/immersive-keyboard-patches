@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
@@ -21,7 +22,7 @@ public final class GlassPanel {
     private static final float EDGE_GLOW_DP = 14f;
     private static final float EDGE_SHADE_DP = 26f;
     private static final float SIDE_GLOW_DP = 9f;
-    private static final float RIM_DP = 1.25f;
+    private static final float RIM_DP = 0.75f;
 
     private static volatile boolean enabled;
 
@@ -147,15 +148,38 @@ public final class GlassPanel {
     }
 
     /** Drawn over the finished keyboard: the thin bright rim along the panel's top edge. */
-    static void drawOnTop(Canvas canvas, float left, float top, float right, float density) {
+    static void drawOnTop(Canvas canvas, float left, float top, float right, float density, float radius) {
+        if (!enabled || right - left <= 0) { return; }
+        if (radius > 0.5f) { return; }
         if (!enabled || right - left <= 0) {
             return;
         }
-        float thickness = RIM_DP * density;
+        // If rounded corners are active, completely skip drawing the rim to avoid any 1px anti-aliasing artifacts.
+        if (radius > 0.5f) {
+            return;
+        }
         if (rim == null) {
             return;
         }
-        fill(canvas, rim, left, top, right, top + thickness);
+        float thickness = RIM_DP * density;
+        if (radius > 0.5f) {
+            // Draw ONLY the top-left and top-right corner arcs (No center line!)
+            Path path = new Path();
+            path.moveTo(left, top + radius);
+            path.quadTo(left, top, left + radius, top);
+            path.moveTo(right - radius, top);
+            path.quadTo(right, top, right, top + radius);
+
+            PAINT.setShader(rim);
+            PAINT.setStyle(Paint.Style.STROKE);
+            PAINT.setStrokeWidth(thickness);
+            canvas.drawPath(path, PAINT);
+            PAINT.setStyle(Paint.Style.FILL);
+            PAINT.setShader(null);
+        } else {
+            // Fallback for square corners
+            fill(canvas, rim, left, top, right, top + thickness);
+        }
     }
 
     private static void fill(Canvas canvas, Shader shader, float left, float top, float right,
@@ -181,22 +205,22 @@ public final class GlassPanel {
         int clear = Color.TRANSPARENT;
 
         sheen = new LinearGradient(left, top, right, bottom,
-                new int[]{white(34), clear, clear, white(14)},
+                new int[]{white(0), clear, clear, white(0)},
                 new float[]{0f, 0.38f, 0.72f, 1f}, Shader.TileMode.CLAMP);
         topGlow = new LinearGradient(0, top, 0, top + glow,
-                white(92), clear, Shader.TileMode.CLAMP);
+                white(0), clear, Shader.TileMode.CLAMP);
         topShade = new LinearGradient(0, top, 0, top + shade,
-                new int[]{clear, black(30), clear},
+                new int[]{clear, clear, clear},
                 new float[]{0.3f, 0.62f, 1f}, Shader.TileMode.CLAMP);
         bottomGlow = new LinearGradient(0, bottom - glow, 0, bottom,
-                clear, white(44), Shader.TileMode.CLAMP);
+                clear, white(0), Shader.TileMode.CLAMP);
         leftGlow = new LinearGradient(left, 0, left + side, 0,
-                white(56), clear, Shader.TileMode.CLAMP);
+                white(0), clear, Shader.TileMode.CLAMP);
         rightGlow = new LinearGradient(right - side, 0, right, 0,
-                clear, white(56), Shader.TileMode.CLAMP);
+                clear, white(0), Shader.TileMode.CLAMP);
         // Brightest toward the corners, the way a curved glass edge catches light.
         rim = new LinearGradient(left, 0, right, 0,
-                new int[]{white(210), white(105), white(210)},
+                new int[]{white(180), white(20), white(180)},
                 new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP);
     }
 

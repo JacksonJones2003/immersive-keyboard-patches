@@ -127,7 +127,7 @@ public final class BottomBarOpacity {
             if (state != null && !state.keyboardHidden) {
                 state.repaintBottomCorners(inputView, canvas);
                 state.repaintTopCorners(inputView, canvas);
-                state.drawGlassOnTop(inputView, canvas);
+                // state.drawGlassOnTop(inputView, canvas); // Disabled to remove Gboard outline
                 state.roundGlassTop(inputView, canvas);
             }
             OverlayPanels.watch(inputView);
@@ -1106,11 +1106,45 @@ public final class BottomBarOpacity {
         /** Glass Panel effect under the keyboard, when that patch is applied. */
         void drawGlassBehind(View inputView, Canvas canvas) {
             if (systemGlass || !GlassPanel.isEnabled() || !settings.enabled
-                    || keyboardTop == NO_TOP) {
+                    || keyboardTop == NO_TOP || Color.alpha(drawnColor) >= OPAQUE) {
                 return;
             }
-            GlassPanel.drawBehind(canvas, 0, topInInputView(inputView), inputView.getWidth(),
-                    inputView.getHeight(), inputView.getResources().getDisplayMetrics().density);
+            float topY = topInInputView(inputView);
+            float radius = detectEffectiveRadius(inputView);
+            int save = -1;
+            if (radius > 0.5f) {
+                cornerPath.rewind();
+                cornerPath.addRoundRect(0, topY, inputView.getWidth(), inputView.getHeight(),
+                        new float[]{radius, radius, radius, radius, 0, 0, 0, 0},
+                        Path.Direction.CW);
+                save = canvas.save();
+                canvas.clipPath(cornerPath);
+            }
+            GlassPanel.drawBehind(canvas, 0, topY, inputView.getWidth(),
+                    inputView.getHeight(),
+                    inputView.getResources().getDisplayMetrics().density);
+            if (save != -1) {
+                canvas.restoreToCount(save);
+            }
+        }
+
+
+        /** Best-effort corner radius of the keyboard panel.
+         *  Tries the view's own outline (may be set by other patches), then the
+         *  configured Translucent Bottom Bar radius, then a sane default. */
+        private float detectEffectiveRadius(View inputView) {
+            if (inputView == null) return 0f;
+            try {
+                android.graphics.Outline outline = new android.graphics.Outline();
+                java.lang.reflect.Method m = View.class.getMethod(
+                        "getOutline", android.graphics.Outline.class);
+                m.invoke(inputView, outline);
+                if (outline.getRadius() > 0.5f) return outline.getRadius();
+            } catch (Throwable ignored) {}
+            float configured = settings.cornerRadiusDp
+                    * inputView.getResources().getDisplayMetrics().density;
+            if (configured > 0.5f) return configured;
+            return 24f * inputView.getResources().getDisplayMetrics().density;
         }
 
         /**
@@ -1205,13 +1239,9 @@ public final class BottomBarOpacity {
                 return;
             }
             float topY = topInInputView(inputView);
-            float radius = settings.cornerRadiusDp
-                    * inputView.getResources().getDisplayMetrics().density;
+            float radius = detectEffectiveRadius(inputView);
             int save = -1;
             if (radius > 0.5f) {
-                // Clip the rim to the keyboard panel's rounded top corners so it
-                // never spills past them. Reuses the same cornerPath shape the
-                // panel's corner-wedge fill already builds.
                 cornerPath.rewind();
                 cornerPath.addRoundRect(0, topY, inputView.getWidth(), inputView.getHeight(),
                         new float[]{radius, radius, radius, radius, 0, 0, 0, 0},
@@ -1220,7 +1250,7 @@ public final class BottomBarOpacity {
                 canvas.clipPath(cornerPath);
             }
             GlassPanel.drawOnTop(canvas, 0, topY, inputView.getWidth(),
-                    inputView.getResources().getDisplayMetrics().density);
+                    inputView.getResources().getDisplayMetrics().density, radius);
             if (save != -1) {
                 canvas.restoreToCount(save);
             }
@@ -1301,6 +1331,16 @@ public final class BottomBarOpacity {
                 view.getViewTreeObserver().addOnPreDrawListener(this);
                 watching = true;
             }
+            try {
+                // Gboard native outline removes the 1px white border
+                View outline = view.findViewWithTag(".keyboard-base-area.keyboard-outline");
+                if (outline != null) {
+                    outline.setBackground(null);
+                    if (outline instanceof ViewGroup) {
+                        ((ViewGroup) outline).setWillNotDraw(true);
+                    }
+                }
+            } catch (Throwable ignored) {}
         }
 
         @Override
